@@ -1,0 +1,53 @@
+# Build directories
+build/
+cmake-build-*/
+out/
+docs/
+external/SFML/doc/
+.claude/
+.cache/
+CLAUDE.md
+
+# IDE files
+.vs/
+.vscode/
+*.user
+*.suo
+*.db
+*.opendb
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+# Compiled files
+*.o
+*.obj
+*.exe
+*.dll
+*.lib
+*.a
+*.pdb
+*.ilk
+*.exp
+
+# External libraries (downloaded by setup script)
+# Uncomment if you want to exclude external dependencies
+# external/imgui/
+# external/imgui-sfml/
+# external/rapidjson/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Runtime/generated files
+imgui.ini
+nul
+
+# Temporary files
+*.tmp
+*.temp
+*~
