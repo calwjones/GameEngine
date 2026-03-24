@@ -1,0 +1,264 @@
+{
+  "width": 960,
+  "height": 1400,
+  "entities": [
+    {
+      "name": "Player",
+      "type": "player",
+      "position": { "x": 80, "y": 1304 },
+      "size": { "x": 32, "y": 48 },
+      "color": { "r": 50, "g": 205, "b": 50, "a": 255 },
+      "hasGravity": true
+    },
+    {
+      "name": "Ground",
+      "type": "platform",
+      "position": { "x": 0, "y": 1352 },
+      "size": { "x": 960, "y": 48 },
+      "color": { "r": 60, "g": 60, "b": 80, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "LeftWall",
+      "type": "platform",
+      "position": { "x": -24, "y": 0 },
+      "size": { "x": 24, "y": 1400 },
+      "color": { "r": 50, "g": 50, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "RightWall",
+      "type": "platform",
+      "position": { "x": 960, "y": 0 },
+      "size": { "x": 24, "y": 1400 },
+      "color": { "r": 50, "g": 50, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "L1",
+      "type": "platform",
+      "position": { "x": 260, "y": 1270 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "L2",
+      "type": "platform",
+      "position": { "x": 500, "y": 1200 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "L3",
+      "type": "platform",
+      "position": { "x": 720, "y": 1120 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "L4",
+      "type": "platform",
+      "position": { "x": 480, "y": 1050 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "L5",
+      "type": "platform",
+      "position": { "x": 240, "y": 980 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "L6",
+      "type": "platform",
+      "position": { "x": 60, "y": 900 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "L7",
+      "type": "platform",
+      "position": { "x": 260, "y": 820 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "L8",
+      "type": "platform",
+      "position": { "x": 480, "y": 740 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "L9",
+      "type": "platform",
+      "position": { "x": 700, "y": 660 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "L10",
+      "type": "platform",
+      "position": { "x": 500, "y": 580 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "L11",
+      "type": "platform",
+      "position": { "x": 280, "y": 500 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "L12",
+      "type": "platform",
+      "position": { "x": 80, "y": 420 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "L13",
+      "type": "platform",
+      "position": { "x": 280, "y": 340 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "L14",
+      "type": "platform",
+      "position": { "x": 500, "y": 260 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "L15",
+      "type": "platform",
+      "position": { "x": 720, "y": 180 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Coin1",
+      "type": "collectible",
+      "position": { "x": 320, "y": 1238 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin2",
+      "type": "collectible",
+      "position": { "x": 560, "y": 1168 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin3",
+      "type": "collectible",
+      "position": { "x": 780, "y": 1088 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin4",
+      "type": "collectible",
+      "position": { "x": 540, "y": 1018 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin5",
+      "type": "collectible",
+      "position": { "x": 300, "y": 948 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin6",
+      "type": "collectible",
+      "position": { "x": 120, "y": 868 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin7",
+      "type": "collectible",
+      "position": { "x": 320, "y": 788 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin8",
+      "type": "collectible",
+      "position": { "x": 540, "y": 708 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin9",
+      "type": "collectible",
+      "position": { "x": 760, "y": 628 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Flyer1",
+      "type": "flying_enemy",
+      "position": { "x": 400, "y": 700 },
+      "size": { "x": 28, "y": 28 },
+      "color": { "r": 180, "g": 50, "b": 220, "a": 255 },
+      "properties": { "patrolSpeed": 60, "amplitude": 30, "frequency": 1.6, "baseY": 700, "minX": 300, "maxX": 640 }
+    },
+    {
+      "name": "Flyer2",
+      "type": "flying_enemy",
+      "position": { "x": 560, "y": 380 },
+      "size": { "x": 28, "y": 28 },
+      "color": { "r": 180, "g": 50, "b": 220, "a": 255 },
+      "properties": { "patrolSpeed": 70, "amplitude": 40, "frequency": 2.0, "baseY": 380, "minX": 400, "maxX": 760 }
+    },
+    {
+      "name": "Goal",
+      "type": "goal",
+      "position": { "x": 780, "y": 132 },
+      "size": { "x": 32, "y": 48 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    }
+  ]
+}

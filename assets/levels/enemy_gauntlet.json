@@ -1,0 +1,193 @@
+{
+  "width": 1800,
+  "height": 640,
+  "entities": [
+    {
+      "name": "Player",
+      "type": "player",
+      "position": { "x": 80, "y": 544 },
+      "size": { "x": 32, "y": 48 },
+      "color": { "r": 50, "g": 205, "b": 50, "a": 255 },
+      "hasGravity": true
+    },
+    {
+      "name": "Ground",
+      "type": "platform",
+      "position": { "x": 0, "y": 592 },
+      "size": { "x": 1800, "y": 48 },
+      "color": { "r": 60, "g": 60, "b": 80, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "LeftWall",
+      "type": "platform",
+      "position": { "x": -24, "y": 0 },
+      "size": { "x": 24, "y": 640 },
+      "color": { "r": 50, "g": 50, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "RightWall",
+      "type": "platform",
+      "position": { "x": 1800, "y": 0 },
+      "size": { "x": 24, "y": 640 },
+      "color": { "r": 50, "g": 50, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "SafeLedge1",
+      "type": "platform",
+      "position": { "x": 220, "y": 510 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 100, "g": 100, "b": 120, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "SafeLedge2",
+      "type": "platform",
+      "position": { "x": 520, "y": 450 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 100, "g": 100, "b": 120, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "SafeLedge3",
+      "type": "platform",
+      "position": { "x": 820, "y": 450 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 100, "g": 100, "b": 120, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "SafeLedge4",
+      "type": "platform",
+      "position": { "x": 1120, "y": 510 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 100, "g": 100, "b": 120, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "SafeLedge5",
+      "type": "platform",
+      "position": { "x": 1420, "y": 470 },
+      "size": { "x": 160, "y": 16 },
+      "color": { "r": 100, "g": 100, "b": 120, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Patroller1",
+      "type": "enemy",
+      "position": { "x": 360, "y": 560 },
+      "size": { "x": 32, "y": 32 },
+      "color": { "r": 220, "g": 20, "b": 60, "a": 255 },
+      "hasGravity": true,
+      "properties": { "patrolSpeed": 80, "minX": 300, "maxX": 500 }
+    },
+    {
+      "name": "Patroller2",
+      "type": "enemy",
+      "position": { "x": 640, "y": 560 },
+      "size": { "x": 32, "y": 32 },
+      "color": { "r": 220, "g": 20, "b": 60, "a": 255 },
+      "hasGravity": true,
+      "properties": { "patrolSpeed": 90, "minX": 580, "maxX": 780 }
+    },
+    {
+      "name": "Patroller3",
+      "type": "enemy",
+      "position": { "x": 980, "y": 560 },
+      "size": { "x": 32, "y": 32 },
+      "color": { "r": 220, "g": 20, "b": 60, "a": 255 },
+      "hasGravity": true,
+      "properties": { "patrolSpeed": 100, "minX": 920, "maxX": 1080 }
+    },
+    {
+      "name": "Shooter1",
+      "type": "shooting_enemy",
+      "position": { "x": 560, "y": 418 },
+      "size": { "x": 32, "y": 32 },
+      "color": { "r": 220, "g": 120, "b": 20, "a": 255 },
+      "hasGravity": true,
+      "properties": { "patrolSpeed": 30, "fireRate": 2.5, "projectileSpeed": 220, "minX": 520, "maxX": 660 }
+    },
+    {
+      "name": "Shooter2",
+      "type": "shooting_enemy",
+      "position": { "x": 1460, "y": 438 },
+      "size": { "x": 32, "y": 32 },
+      "color": { "r": 220, "g": 120, "b": 20, "a": 255 },
+      "hasGravity": true,
+      "properties": { "patrolSpeed": 35, "fireRate": 2.0, "projectileSpeed": 240, "minX": 1420, "maxX": 1580 }
+    },
+    {
+      "name": "Flyer1",
+      "type": "flying_enemy",
+      "position": { "x": 760, "y": 360 },
+      "size": { "x": 28, "y": 28 },
+      "color": { "r": 180, "g": 50, "b": 220, "a": 255 },
+      "properties": { "patrolSpeed": 80, "amplitude": 40, "frequency": 2.0, "baseY": 360, "minX": 620, "maxX": 960 }
+    },
+    {
+      "name": "Flyer2",
+      "type": "flying_enemy",
+      "position": { "x": 1200, "y": 340 },
+      "size": { "x": 28, "y": 28 },
+      "color": { "r": 180, "g": 50, "b": 220, "a": 255 },
+      "properties": { "patrolSpeed": 90, "amplitude": 50, "frequency": 2.4, "baseY": 340, "minX": 1040, "maxX": 1380 }
+    },
+    {
+      "name": "Coin1",
+      "type": "collectible",
+      "position": { "x": 280, "y": 478 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin2",
+      "type": "collectible",
+      "position": { "x": 580, "y": 418 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin3",
+      "type": "collectible",
+      "position": { "x": 880, "y": 418 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin4",
+      "type": "collectible",
+      "position": { "x": 1180, "y": 478 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin5",
+      "type": "collectible",
+      "position": { "x": 1490, "y": 438 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Goal",
+      "type": "goal",
+      "position": { "x": 1720, "y": 544 },
+      "size": { "x": 32, "y": 48 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    }
+  ]
+}

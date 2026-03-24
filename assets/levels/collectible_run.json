@@ -1,0 +1,201 @@
+{
+  "width": 1600,
+  "height": 640,
+  "entities": [
+    {
+      "name": "Player",
+      "type": "player",
+      "position": { "x": 80, "y": 544 },
+      "size": { "x": 32, "y": 48 },
+      "color": { "r": 50, "g": 205, "b": 50, "a": 255 },
+      "hasGravity": true
+    },
+    {
+      "name": "Ground",
+      "type": "platform",
+      "position": { "x": 0, "y": 592 },
+      "size": { "x": 1600, "y": 48 },
+      "color": { "r": 60, "g": 60, "b": 80, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "LeftWall",
+      "type": "platform",
+      "position": { "x": -24, "y": 0 },
+      "size": { "x": 24, "y": 640 },
+      "color": { "r": 50, "g": 50, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "RightWall",
+      "type": "platform",
+      "position": { "x": 1600, "y": 0 },
+      "size": { "x": 24, "y": 640 },
+      "color": { "r": 50, "g": 50, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Step1",
+      "type": "platform",
+      "position": { "x": 180, "y": 520 },
+      "size": { "x": 120, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Step2",
+      "type": "platform",
+      "position": { "x": 360, "y": 450 },
+      "size": { "x": 120, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Step3",
+      "type": "platform",
+      "position": { "x": 540, "y": 380 },
+      "size": { "x": 120, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Step4",
+      "type": "platform",
+      "position": { "x": 720, "y": 310 },
+      "size": { "x": 120, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Step5",
+      "type": "platform",
+      "position": { "x": 900, "y": 240 },
+      "size": { "x": 120, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Step6",
+      "type": "platform",
+      "position": { "x": 1080, "y": 310 },
+      "size": { "x": 120, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Step7",
+      "type": "platform",
+      "position": { "x": 1260, "y": 380 },
+      "size": { "x": 120, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Step8",
+      "type": "platform",
+      "position": { "x": 1420, "y": 450 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Coin1",
+      "type": "collectible",
+      "position": { "x": 230, "y": 488 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin2",
+      "type": "collectible",
+      "position": { "x": 410, "y": 418 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin3",
+      "type": "collectible",
+      "position": { "x": 590, "y": 348 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin4",
+      "type": "collectible",
+      "position": { "x": 770, "y": 278 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "CoinTop",
+      "type": "collectible",
+      "position": { "x": 950, "y": 208 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin5",
+      "type": "collectible",
+      "position": { "x": 1130, "y": 278 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin6",
+      "type": "collectible",
+      "position": { "x": 1310, "y": 348 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin7",
+      "type": "collectible",
+      "position": { "x": 1480, "y": 418 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin8",
+      "type": "collectible",
+      "position": { "x": 1200, "y": 560 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin9",
+      "type": "collectible",
+      "position": { "x": 600, "y": 560 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Goal",
+      "type": "goal",
+      "position": { "x": 1520, "y": 544 },
+      "size": { "x": 32, "y": 48 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    }
+  ]
+}

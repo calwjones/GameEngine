@@ -1,0 +1,193 @@
+{
+  "width": 1800,
+  "height": 720,
+  "entities": [
+    {
+      "name": "Player",
+      "type": "player",
+      "position": { "x": 80, "y": 584 },
+      "size": { "x": 32, "y": 48 },
+      "color": { "r": 50, "g": 205, "b": 50, "a": 255 },
+      "hasGravity": true
+    },
+    {
+      "name": "Ground",
+      "type": "platform",
+      "position": { "x": 0, "y": 632 },
+      "size": { "x": 1800, "y": 88 },
+      "color": { "r": 55, "g": 55, "b": 75, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "LeftWall",
+      "type": "platform",
+      "position": { "x": -24, "y": 0 },
+      "size": { "x": 24, "y": 720 },
+      "color": { "r": 50, "g": 50, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "RightWall",
+      "type": "platform",
+      "position": { "x": 1800, "y": 0 },
+      "size": { "x": 24, "y": 720 },
+      "color": { "r": 50, "g": 50, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Tutorial1",
+      "type": "platform",
+      "position": { "x": 240, "y": 560 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Tutorial2",
+      "type": "platform",
+      "position": { "x": 440, "y": 490 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Tutorial3",
+      "type": "platform",
+      "position": { "x": 640, "y": 420 },
+      "size": { "x": 160, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Enemy1",
+      "type": "enemy",
+      "position": { "x": 320, "y": 600 },
+      "size": { "x": 32, "y": 32 },
+      "color": { "r": 220, "g": 20, "b": 60, "a": 255 },
+      "hasGravity": true,
+      "properties": { "patrolSpeed": 70, "minX": 260, "maxX": 560 }
+    },
+    {
+      "name": "Coin1",
+      "type": "collectible",
+      "position": { "x": 300, "y": 528 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin2",
+      "type": "collectible",
+      "position": { "x": 500, "y": 458 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin3",
+      "type": "collectible",
+      "position": { "x": 700, "y": 388 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "MovingBridge",
+      "type": "moving_platform",
+      "position": { "x": 880, "y": 420 },
+      "size": { "x": 128, "y": 16 },
+      "color": { "r": 60, "g": 120, "b": 180, "a": 255 },
+      "isStatic": true,
+      "properties": { "ax": 880, "ay": 420, "bx": 1080, "by": 420, "speed": 90 }
+    },
+    {
+      "name": "HazardPit",
+      "type": "hazard",
+      "position": { "x": 1020, "y": 600 },
+      "size": { "x": 160, "y": 32 },
+      "color": { "r": 200, "g": 60, "b": 60, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "LandingPad",
+      "type": "platform",
+      "position": { "x": 1240, "y": 430 },
+      "size": { "x": 160, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Shooter1",
+      "type": "shooting_enemy",
+      "position": { "x": 1280, "y": 398 },
+      "size": { "x": 32, "y": 32 },
+      "color": { "r": 220, "g": 120, "b": 20, "a": 255 },
+      "hasGravity": true,
+      "properties": { "patrolSpeed": 40, "fireRate": 2.2, "projectileSpeed": 220, "minX": 1240, "maxX": 1400 }
+    },
+    {
+      "name": "Flyer1",
+      "type": "flying_enemy",
+      "position": { "x": 1100, "y": 320 },
+      "size": { "x": 28, "y": 28 },
+      "color": { "r": 180, "g": 50, "b": 220, "a": 255 },
+      "properties": { "patrolSpeed": 70, "amplitude": 40, "frequency": 1.8, "baseY": 320, "minX": 1000, "maxX": 1300 }
+    },
+    {
+      "name": "Coin4",
+      "type": "collectible",
+      "position": { "x": 1320, "y": 398 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "HighStep1",
+      "type": "platform",
+      "position": { "x": 1460, "y": 360 },
+      "size": { "x": 120, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "HighStep2",
+      "type": "platform",
+      "position": { "x": 1620, "y": 300 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Coin5",
+      "type": "collectible",
+      "position": { "x": 1510, "y": 328 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin6",
+      "type": "collectible",
+      "position": { "x": 1680, "y": 268 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Goal",
+      "type": "goal",
+      "position": { "x": 1720, "y": 252 },
+      "size": { "x": 32, "y": 48 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    }
+  ]
+}
