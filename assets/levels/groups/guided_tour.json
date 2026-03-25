@@ -1,0 +1,10 @@
+{
+  "name": "Guided Tour",
+  "lives": 3,
+  "levels": [
+    "tour_1_intro.json",
+    "tour_2_patrol.json",
+    "tour_3_shooters.json",
+    "tour_4_finale.json"
+  ]
+}

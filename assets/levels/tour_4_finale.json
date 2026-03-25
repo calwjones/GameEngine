@@ -1,0 +1,134 @@
+{
+  "width": 1800,
+  "height": 600,
+  "entities": [
+    {
+      "name": "Player",
+      "type": "player",
+      "position": { "x": 60, "y": 504 },
+      "size": { "x": 32, "y": 48 },
+      "color": { "r": 50, "g": 205, "b": 50, "a": 255 },
+      "hasGravity": true
+    },
+    {
+      "name": "LeftGround",
+      "type": "platform",
+      "position": { "x": 0, "y": 552 },
+      "size": { "x": 700, "y": 48 },
+      "color": { "r": 60, "g": 60, "b": 80, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "PitHazard",
+      "type": "hazard",
+      "position": { "x": 700, "y": 580 },
+      "size": { "x": 400, "y": 20 },
+      "color": { "r": 200, "g": 60, "b": 60, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "RightGround",
+      "type": "platform",
+      "position": { "x": 1100, "y": 552 },
+      "size": { "x": 700, "y": 48 },
+      "color": { "r": 60, "g": 60, "b": 80, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "LeftWall",
+      "type": "platform",
+      "position": { "x": -24, "y": 0 },
+      "size": { "x": 24, "y": 600 },
+      "color": { "r": 50, "g": 50, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "RightWall",
+      "type": "platform",
+      "position": { "x": 1800, "y": 0 },
+      "size": { "x": 24, "y": 600 },
+      "color": { "r": 50, "g": 50, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Bridge",
+      "type": "moving_platform",
+      "position": { "x": 680, "y": 500 },
+      "size": { "x": 120, "y": 16 },
+      "color": { "r": 60, "g": 120, "b": 180, "a": 255 },
+      "isStatic": true,
+      "properties": { "ax": 680, "ay": 500, "bx": 960, "by": 500, "speed": 70 }
+    },
+    {
+      "name": "Ledge1",
+      "type": "platform",
+      "position": { "x": 1250, "y": 470 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "Ledge2",
+      "type": "platform",
+      "position": { "x": 1470, "y": 410 },
+      "size": { "x": 140, "y": 16 },
+      "color": { "r": 120, "g": 90, "b": 60, "a": 255 },
+      "isStatic": true
+    },
+    {
+      "name": "FinalPatrol",
+      "type": "enemy",
+      "position": { "x": 1320, "y": 520 },
+      "size": { "x": 32, "y": 32 },
+      "color": { "r": 220, "g": 20, "b": 60, "a": 255 },
+      "hasGravity": true,
+      "properties": { "patrolSpeed": 80, "minX": 1200, "maxX": 1540 }
+    },
+    {
+      "name": "Coin1",
+      "type": "collectible",
+      "position": { "x": 220, "y": 504 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin2",
+      "type": "collectible",
+      "position": { "x": 460, "y": 504 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin3",
+      "type": "collectible",
+      "position": { "x": 1300, "y": 442 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "Coin4",
+      "type": "collectible",
+      "position": { "x": 1520, "y": 382 },
+      "size": { "x": 16, "y": 16 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    },
+    {
+      "name": "FinalGoal",
+      "type": "goal",
+      "position": { "x": 1720, "y": 504 },
+      "size": { "x": 32, "y": 48 },
+      "color": { "r": 255, "g": 215, "b": 0, "a": 255 },
+      "isStatic": true,
+      "isTrigger": true
+    }
+  ]
+}
