@@ -4,20 +4,19 @@
 
 namespace Game {
 
-// floats + bobs. horizontal patrol like Enemy, vertical is y = baseY + amp*sin(phase). baseY is snapshotted at play start, phase is staggered per-flyer so they dont bob in sync
 class FlyingEnemy : public Engine::Entity {
     float m_speed = 60.f;
     float m_dir = 1.f;
-    float m_amplitude = 50.f;   // bob height in px
-    float m_frequency = 2.f;    // rad/s, not hz
-    float m_baseY = 0.f;        // vertical midpoint, snapshotted at play start
+    float m_amplitude = 50.f;
+    float m_frequency = 2.f;
+    float m_baseY = 0.f;
     float m_phase = 0.f;
     float m_minX = 0.f, m_maxX = 0.f;
     bool m_hasBounds = false;
 
 public:
     FlyingEnemy() : Entity("Flying Enemy", "flying_enemy") {
-        color = sf::Color(180, 50, 220);   // purple
+        color = sf::Color(180, 50, 220);
         size = {28.f, 28.f};
         hasGravity = false;
     }
@@ -61,14 +60,14 @@ public:
     }
 
     void update(float dt) override {
-        velocity.x = m_speed * m_dir;   // horizontal patrol, same logic as Enemy
+        velocity.x = m_speed * m_dir;
         if (m_hasBounds) {
             if (m_dir > 0 && position.x + size.x >= m_maxX) { m_dir = -m_dir; position.x = m_maxX - size.x; }
             else if (m_dir < 0 && position.x <= m_minX) { m_dir = -m_dir; position.x = m_minX; }
         }
         position.x += velocity.x * dt;
 
-        // set y ABSOLUTELY, not += — else sine drifts from accumulated float error
+        // absolute y avoids float drift over time
         m_phase += m_frequency * dt;
         position.y = m_baseY + m_amplitude * std::sin(m_phase);
     }

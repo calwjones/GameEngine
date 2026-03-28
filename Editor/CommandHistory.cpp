@@ -2,12 +2,12 @@
 
 namespace Editor {
 
-static constexpr size_t MAX_UNDO_HISTORY = 100;   // hard cap so drag sessions dont eat ram
+static constexpr size_t MAX_UNDO_HISTORY = 100;
 
 EntityState EntityState::capture(const Engine::Entity* e) {
     return {e->name, e->type, e->position, e->size, e->velocity,
             e->color, e->isStatic, e->hasGravity, e->isTrigger,
-            e->serializeProperties()};   // subclass override grabs fire rate / patrol speed / etc
+            e->serializeProperties()};
 }
 
 void EntityState::apply(Engine::Entity* e) const {
@@ -18,7 +18,6 @@ void EntityState::apply(Engine::Entity* e) const {
     e->deserializeProperties(properties);
 }
 
-// exact float compare on purpose — "did anything at all change", not "did it change by more than epsilon"
 bool EntityState::operator!=(const EntityState& other) const {
     if (name != other.name || type != other.type ||
         position.x != other.position.x || position.y != other.position.y ||
@@ -29,7 +28,6 @@ bool EntityState::operator!=(const EntityState& other) const {
         isStatic != other.isStatic || hasGravity != other.hasGravity ||
         isTrigger != other.isTrigger)
         return true;
-    // compare subclass property maps
     if (properties.size() != other.properties.size()) return true;
     for (auto& [k, v] : properties) {
         auto it = other.properties.find(k);
@@ -39,10 +37,10 @@ bool EntityState::operator!=(const EntityState& other) const {
 }
 
 void CommandHistory::push(std::unique_ptr<Command> cmd) {
-    m_redoStack.clear();   // new edit invalidates redo chain
+    m_redoStack.clear();
     m_undoStack.push_back(std::move(cmd));
     if (m_undoStack.size() > MAX_UNDO_HISTORY)
-        m_undoStack.erase(m_undoStack.begin());   // drop oldest, O(n) but n is tiny
+        m_undoStack.erase(m_undoStack.begin());
 }
 
 void CommandHistory::undo() {
@@ -97,7 +95,6 @@ std::string MoveCommand::description() const {
     return "Move " + std::to_string(m_entries.size()) + " entities";
 }
 
-// ownership ping-pong: entity lives in mgr OR on the command, never both. flag flips on execute/undo, dtor only frees if we still own it
 AddEntityCommand::AddEntityCommand(Engine::EntityManager& mgr, Engine::Entity* e)
     : m_mgr(mgr), m_entity(e), m_name(e->name) {}
 
@@ -112,7 +109,6 @@ void AddEntityCommand::execute() {
     }
 }
 
-// detach = pull out of mgr without freeing, so redo can re-add the same ptr
 void AddEntityCommand::undo() {
     m_mgr.detachEntity(m_entity);
     m_ownsEntity = true;
@@ -129,7 +125,6 @@ DeleteEntityCommand::~DeleteEntityCommand() {
     if (m_ownsEntity && m_entity) delete m_entity;
 }
 
-// mirror of AddEntityCommand — detach on execute, re-add on undo
 void DeleteEntityCommand::execute() {
     m_mgr.detachEntity(m_entity);
     m_ownsEntity = true;

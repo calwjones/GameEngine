@@ -12,7 +12,6 @@
 
 namespace Editor {
 
-// snap on activate, push on deactivate — whole drag becomes one undo step. history=null means play mode, no undo entries
 void PropertiesPanel::checkUndo(Engine::Entity* e, CommandHistory* history) {
     if (!history) return;
     if (ImGui::IsItemActivated()) {
@@ -27,7 +26,6 @@ void PropertiesPanel::checkUndo(Engine::Entity* e, CommandHistory* history) {
     }
 }
 
-// renders name/type/transform/physics/appearance/debug sections for the selected entity
 void PropertiesPanel::render(Engine::Entity* e, CommandHistory* history) {
     if (!m_visible) return;
 
@@ -44,13 +42,11 @@ void PropertiesPanel::render(Engine::Entity* e, CommandHistory* history) {
         return;
     }
 
-    // selection changed mid-drag → bail on edit state or wed push a command w/ the wrong entity
     if (e != m_lastEntity) {
         m_lastEntity = e;
         m_editing = false;
     }
 
-    // name change is undoable, type change also resets physics/size/colour defaults
     ImGui::Spacing();
     char nameBuf[128] = {0};
     snprintf(nameBuf, sizeof(nameBuf), "%s", e->name.c_str());
@@ -62,7 +58,6 @@ void PropertiesPanel::render(Engine::Entity* e, CommandHistory* history) {
     }
     checkUndo(e, history);
 
-    // type dropdown — fed from EntityTypeRegistry so adding a new type is one row in the registry table
     static constexpr int typeCount = (int)Engine::kEntityTypes.size();
     static const char* types[typeCount] = {
         Engine::kEntityTypes[0].type, Engine::kEntityTypes[1].type, Engine::kEntityTypes[2].type,
@@ -76,13 +71,11 @@ void PropertiesPanel::render(Engine::Entity* e, CommandHistory* history) {
     ImGui::Text("Type");
     ImGui::SetNextItemWidth(-1);
     if (typeIdx < 0) {
-        // unknown type → read-only, dont silently overwrite something we cant round-trip
         ImGui::TextDisabled("%s", e->type.c_str());
     } else if (ImGui::Combo("##Type", &typeIdx, types, typeCount)) {
         std::string newType = types[typeIdx];
         if (newType != e->type) {
             e->type = newType;
-            // slap on sensible defaults for the new type — else u end up w/ a wall-shaped green block marked as player
             if (newType == "player") {
                 e->size = {32.f, 48.f};
                 e->color = sf::Color(50, 205, 50);
@@ -148,7 +141,6 @@ void PropertiesPanel::render(Engine::Entity* e, CommandHistory* history) {
     ImGui::Separator();
     ImGui::Spacing();
 
-    // Transform
     if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
         float pos[2] = {e->position.x, e->position.y};
         ImGui::Text("Position"); ImGui::SameLine(); ImGui::TextDisabled("(X, Y)");
@@ -165,7 +157,6 @@ void PropertiesPanel::render(Engine::Entity* e, CommandHistory* history) {
         checkUndo(e, history);
     }
 
-    // Physics
     if (ImGui::CollapsingHeader("Physics", ImGuiTreeNodeFlags_DefaultOpen)) {
         float vel[2] = {e->velocity.x, e->velocity.y};
         ImGui::Text("Velocity"); ImGui::SameLine(); ImGui::TextDisabled("(X, Y)");
@@ -180,7 +171,7 @@ void PropertiesPanel::render(Engine::Entity* e, CommandHistory* history) {
 
         ImGui::Spacing();
 
-        // imgui checkboxes dont fire IsItemActivated/Deactivated so checkUndo() doesnt work — this lambda handles undo manually via pointer-to-member
+        // checkboxes don't fire IsItemActivated/Deactivated, undo handled manually
         auto undoableCheckbox = [&](const char* label, bool& field, bool EntityState::* member) {
             bool prev = field;
             if (ImGui::Checkbox(label, &field) && history) {
@@ -201,7 +192,6 @@ void PropertiesPanel::render(Engine::Entity* e, CommandHistory* history) {
         }
     }
 
-    // Colour
     if (ImGui::CollapsingHeader("Appearance", ImGuiTreeNodeFlags_DefaultOpen)) {
         float col[4] = {e->color.r / 255.f, e->color.g / 255.f, e->color.b / 255.f, e->color.a / 255.f};
         ImGui::Text("Colour");
@@ -221,7 +211,6 @@ void PropertiesPanel::render(Engine::Entity* e, CommandHistory* history) {
         ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - 60);
         if (ImGui::InputText("##TexturePath", texBuf, sizeof(texBuf))) {
             e->texturePath = texBuf;
-            // renderer picks this up next frame — TextureManager caches by path + the resolved ptr is cached on the entity
         }
         checkUndo(e, history);
         ImGui::SameLine();
@@ -232,7 +221,7 @@ void PropertiesPanel::render(Engine::Entity* e, CommandHistory* history) {
         ImGui::TextDisabled("Path relative to assets/textures/");
     }
 
-    // subclass-specific sections, gated by dynamic_cast. ordered by specificity — ShootingEnemy before Enemy so the right UI shows up even if inheritance changes later
+    // ShootingEnemy must come before Enemy (more derived first)
     if (auto* player = dynamic_cast<Game::Player*>(e)) {
         if (ImGui::CollapsingHeader("Player Properties", ImGuiTreeNodeFlags_DefaultOpen)) {
             float speed = player->getMoveSpeed();
@@ -250,7 +239,6 @@ void PropertiesPanel::render(Engine::Entity* e, CommandHistory* history) {
             checkUndo(e, history);
         }
     } else if (auto* enemy = dynamic_cast<Game::ShootingEnemy*>(e)) {
-        // ShootingEnemy before Enemy — see note above the first dynamic_cast
         if (ImGui::CollapsingHeader("Shooting Enemy Properties", ImGuiTreeNodeFlags_DefaultOpen)) {
             float speed = enemy->getPatrolSpeed();
             ImGui::Text("Patrol Speed"); ImGui::SetNextItemWidth(-1);
@@ -368,7 +356,6 @@ void PropertiesPanel::render(Engine::Entity* e, CommandHistory* history) {
                 mp->setPointB({b[0], b[1]});
             checkUndo(e, history);
 
-            // visual guide
             sf::Vector2f diff = mp->getPointB() - mp->getPointA();
             float dist = std::sqrt(diff.x * diff.x + diff.y * diff.y);
             ImGui::Spacing();
@@ -384,7 +371,6 @@ void PropertiesPanel::render(Engine::Entity* e, CommandHistory* history) {
             checkUndo(e, history);
         }
     } else if (auto* goal = dynamic_cast<Game::Goal*>(e)) {
-        // nextLevel is a string so it bypasses undo (EntityState only snapshots floats) — same deal as texturePath
         if (ImGui::CollapsingHeader("Goal Properties", ImGuiTreeNodeFlags_DefaultOpen)) {
             char nextBuf[128] = {0};
             snprintf(nextBuf, sizeof(nextBuf), "%s", goal->nextLevel.c_str());
@@ -399,7 +385,6 @@ void PropertiesPanel::render(Engine::Entity* e, CommandHistory* history) {
         }
     }
 
-    // debug section — collapsed by default, shows bounds + centre for sanity-checking placements
     if (ImGui::CollapsingHeader("Debug")) {
         auto b = e->getBounds();
         ImGui::Text("Bounds: %.1f, %.1f  %.1f x %.1f", b.left, b.top, b.width, b.height);

@@ -3,16 +3,15 @@
 
 namespace Game {
 
-// patrol enemy that also shoots. timer raises a fire flag every fireRate seconds, GameplaySystem reads it + spawns the projectile — we dont spawn from here bc subclasses shouldnt know about EntityManager
 class ShootingEnemy : public Engine::Entity {
     float m_speed = 40.f;
     float m_dir = 1.f;
-    float m_fireRate = 2.f;      // seconds between shots
+    float m_fireRate = 2.f;
     float m_fireTimer = 0.f;
     float m_projSpeed = 200.f;
     float m_minX = 0.f, m_maxX = 0.f;
     bool m_hasBounds = false;
-    bool m_fireFlag = false;     // set by update(), cleared by consumeFireFlag()
+    bool m_fireFlag = false;
 
 public:
     ShootingEnemy() : Entity("Shooting Enemy", "shooting_enemy") {
@@ -53,7 +52,7 @@ public:
         if (minIt != p.end() && maxIt != p.end()) setPatrolBounds(minIt->second, maxIt->second);
     }
 
-    // read-and-reset — named "consume" not "shouldFire" so the side effect is obvious (the old name looked pure + bit callers)
+    // read-and-reset
     bool consumeFireFlag() {
         bool f = m_fireFlag;
         m_fireFlag = false;
@@ -61,7 +60,7 @@ public:
     }
 
     void update(float dt) override {
-        velocity.x = m_speed * m_dir;   // same patrol dance as Enemy
+        velocity.x = m_speed * m_dir;
         if (m_hasBounds) {
             if (m_dir > 0 && position.x + size.x >= m_maxX) { m_dir = -m_dir; position.x = m_maxX - size.x; }
             else if (m_dir < 0 && position.x <= m_minX) { m_dir = -m_dir; position.x = m_minX; }
@@ -70,7 +69,7 @@ public:
 
         m_fireTimer += dt;
         if (m_fireTimer >= m_fireRate) {
-            m_fireTimer -= m_fireRate;   // -= not =0 so we dont drop fractional leftover time
+            m_fireTimer -= m_fireRate;
             m_fireFlag = true;
         }
     }

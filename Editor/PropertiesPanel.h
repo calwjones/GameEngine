@@ -4,11 +4,11 @@
 
 namespace Editor {
 
-// right sidebar — editable fields for the selected entity. drag sliders are batched into a single undo step via IsItemActivated/Deactivated, one drag = one command
+// drags batched into one undo step via IsItemActivated/Deactivated
 class PropertiesPanel {
     bool m_visible = true;
-    Engine::Entity* m_lastEntity = nullptr;   // resets edit state if selection changes mid-drag
-    EntityState m_editSnapshot;               // "before" state, grabbed on IsItemActivated
+    Engine::Entity* m_lastEntity = nullptr;
+    EntityState m_editSnapshot;
     bool m_editing = false;
 
 public:
@@ -16,7 +16,7 @@ public:
     bool& isVisible() { return m_visible; }
 
 private:
-    void checkUndo(Engine::Entity* e, CommandHistory* history);   // call right after each imgui widget
+    void checkUndo(Engine::Entity* e, CommandHistory* history);
 };
 
 }

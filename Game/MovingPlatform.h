@@ -3,21 +3,19 @@
 
 namespace Game {
 
-// patrols between pointA/pointB at constant speed. kinematic body — isStatic so physics cant push it, but update() moves it manually.
-// player riding: GameplaySystem reads getDelta() each tick + adds it to the player if they're standing on top, else they'd instantly fall off
 class MovingPlatform : public Engine::Entity {
     sf::Vector2f m_pointA{0.f, 0.f};
     sf::Vector2f m_pointB{200.f, 0.f};
-    float m_speed = 80.f;              // px/s along the path
-    float m_t = 0.f;                   // parametric, 0=A 1=B
-    float m_dir = 1.f;                 // +1 → B, -1 → A
-    sf::Vector2f m_delta{0.f, 0.f};    // movement this frame, GameplaySystem reads for rider carry
+    float m_speed = 80.f;
+    float m_t = 0.f;
+    float m_dir = 1.f;
+    sf::Vector2f m_delta{0.f, 0.f};   // per-frame movement, read for rider carry
 
 public:
     MovingPlatform() : Entity("Moving Platform", "moving_platform") {
-        color = sf::Color(60, 120, 180);   // steely blue
+        color = sf::Color(60, 120, 180);
         size = {128.f, 16.f};
-        isStatic = true;                   // we move it manually, physics must leave it alone
+        isStatic = true;
         hasGravity = false;
     }
 
@@ -29,7 +27,6 @@ public:
     float getSpeed() const { return m_speed; }
     sf::Vector2f getDelta() const { return m_delta; }
 
-    // called on play start — snap back to A, else the platform would teleport if we started mid-cycle
     void resetToStart() {
         m_t = 0.f;
         m_dir = 1.f;
@@ -55,16 +52,15 @@ public:
     void update(float dt) override {
         sf::Vector2f diff = m_pointB - m_pointA;
         float dist = std::sqrt(diff.x * diff.x + diff.y * diff.y);
-        if (dist < 0.1f) { m_delta = {0.f, 0.f}; return; }   // A≡B → no motion, also guards div-by-zero
+        if (dist < 0.1f) { m_delta = {0.f, 0.f}; return; }
 
-        // convert px/s into a parametric t-step using path length → constant speed regardless of distance
         float tStep = (m_speed / dist) * dt;
         m_t += m_dir * tStep;
 
-        if (m_t >= 1.f) { m_t = 1.f; m_dir = -1.f; }   // bounce at endpoints
+        if (m_t >= 1.f) { m_t = 1.f; m_dir = -1.f; }
         else if (m_t <= 0.f) { m_t = 0.f; m_dir = 1.f; }
 
-        sf::Vector2f newPos = m_pointA + diff * m_t;   // lerp A→B, stash delta for player riding
+        sf::Vector2f newPos = m_pointA + diff * m_t;
         m_delta = newPos - position;
         position = newPos;
     }

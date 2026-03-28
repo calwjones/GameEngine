@@ -4,14 +4,12 @@
 
 namespace Editor {
 
-// read/reset/return, called once a frame by EditorApplication
 EntityTemplate EntityPalette::consumeCreateRequest() {
     auto r = m_createRequest;
-    m_createRequest = EntityTemplate::None;   // MUST reset or wed spawn every frame
+    m_createRequest = EntityTemplate::None;
     return r;
 }
 
-// Selectable claims the row for hover/click, then we draw the swatch + two-line label manually bc imgui has no built-in widget for this layout
 void EntityPalette::render() {
     if (!m_visible) return;
 
@@ -22,7 +20,6 @@ void EntityPalette::render() {
     ImGui::Separator();
     ImGui::Spacing();
 
-    // w/h kept here bc the swatch is sized proportionally to entity dimensions (visual hint that Ground is bigger than Platform etc)
     struct TemplateInfo {
         EntityTemplate id;
         const char* name;
@@ -51,20 +48,17 @@ void EntityPalette::render() {
     for (auto& tmpl : templates) {
         ImGui::PushID((int)tmpl.id);
 
-        // swatch size is proportional to entity dimensions, clamped so it doesnt overflow the row
         float rowH = 32.f;
         float previewW = std::min(tmpl.w * 0.4f, availW * 0.25f);
         previewW = std::max(previewW, 16.f);
         float previewH = std::min(tmpl.h * 0.4f, rowH - 4.f);
         previewH = std::max(previewH, 8.f);
 
-        // Selectable claims the full row for hover/click, then we draw the swatch over it
         ImVec2 cursor = ImGui::GetCursorScreenPos();
         if (ImGui::Selectable("##sel", false, 0, ImVec2(availW, rowH))) {
             m_createRequest = tmpl.id;
         }
 
-        // draw the colour swatch manually using the DrawList api
         ImDrawList* draw = ImGui::GetWindowDrawList();
         float swatchX = cursor.x + 4;
         float swatchY = cursor.y + (rowH - previewH) / 2;

@@ -17,8 +17,6 @@ void EntityManager::indexRemove(Entity* e) {
 
 void EntityManager::addEntity(Entity* e) {
     if (!e) return;
-    // if we're mid-update loop, queue it — mutating m_entities rn would
-    // invalidate the range-for iterator + crash. gets flushed in processPending()
     if (m_updating) {
         m_pendingAdd.push_back(e);
     } else {
@@ -41,10 +39,7 @@ void EntityManager::removeEntity(Entity* e) {
     }
 }
 
-// like removeEntity but WITHOUT the delete. caller becomes the new owner.
-// used by DeleteEntityCommand — when u delete something in the editor we
-// keep the ptr alive inside the undo stack so ctrl+z can put it back.
-// if we actually deleted it, undo = use after free
+// detach keeps the ptr alive for undo stacks
 bool EntityManager::detachEntity(Entity* e) {
     if (!e) return false;
     auto it = std::find(m_entities.begin(), m_entities.end(), e);
@@ -68,9 +63,6 @@ const std::vector<Entity*>& EntityManager::getEntitiesByType(const std::string& 
     return it == m_byType.end() ? empty : it->second;
 }
 
-// swap with the entity above/below in the list. since vector order = draw order,
-// this lets u reorder the scene panel (move thing to front/back). scene panel
-// uses the arrows for this
 void EntityManager::moveEntity(Entity* e, int direction) {
     auto it = std::find(m_entities.begin(), m_entities.end(), e);
     if (it == m_entities.end()) return;
@@ -82,14 +74,13 @@ void EntityManager::moveEntity(Entity* e, int direction) {
 }
 
 void EntityManager::updateAll(float dt) {
-    m_updating = true;   // arms the deferred path
+    m_updating = true;
     for (auto* e : m_entities) e->update(dt);
     m_updating = false;
-    processPending();    // NOW safe to mutate — drain the queues
+    processPending();
 }
 
-// two passes so static stuff (ground, walls) always draws UNDER dynamic stuff (player, enemies).
-// cheap n easy poor mans z-ordering lol
+// static first so dynamic entities draw on top
 void EntityManager::renderAll(Renderer& renderer) {
     for (auto* e : m_entities) if (e->isStatic) e->render(renderer);
     for (auto* e : m_entities) if (!e->isStatic) e->render(renderer);

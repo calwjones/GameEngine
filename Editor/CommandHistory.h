@@ -8,20 +8,18 @@
 
 namespace Editor {
 
-// frozen snapshot of an entity — before/after payload for PropertyChangeCommand. grabs base fields + the subclass float map, skips strings like texturePath / Goal.nextLevel
 struct EntityState {
     std::string name, type;
     sf::Vector2f position, size, velocity;
     sf::Color color;
     bool isStatic, hasGravity, isTrigger;
-    Engine::Entity::Properties properties;   // subclass float map, from serializeProperties()
+    Engine::Entity::Properties properties;
 
     static EntityState capture(const Engine::Entity* e);
     void apply(Engine::Entity* e) const;
     bool operator!=(const EntityState& other) const;
 };
 
-// Command pattern base — every undoable action is a subclass. execute() does it, undo() reverses it, description() feeds the Edit menu
 class Command {
 public:
     virtual ~Command() = default;
@@ -30,7 +28,6 @@ public:
     virtual std::string description() const = 0;
 };
 
-// two-stack undo/redo, capped at 100. any new edit clears redoStack — same as any text editor
 class CommandHistory {
     std::vector<std::unique_ptr<Command>> m_undoStack;
     std::vector<std::unique_ptr<Command>> m_redoStack;
@@ -47,7 +44,6 @@ public:
     void clear();
 };
 
-// multi-select drag = ONE MoveCommand w/ N entries, so one undo reverses the whole drag, not N clicks
 class MoveCommand : public Command {
 public:
     struct Entry {
@@ -64,7 +60,7 @@ public:
     std::string description() const override;
 };
 
-// undo of an add = detach (not delete), so the ptr stays alive for redo. m_ownsEntity tracks who holds the allocation — command or mgr
+// ownership ping-pongs between manager and command based on m_ownsEntity
 class AddEntityCommand : public Command {
     Engine::EntityManager& m_mgr;
     Engine::Entity* m_entity;
@@ -93,7 +89,6 @@ public:
     Engine::Entity* getEntity() const { return m_entity; }
 };
 
-// stores before/after EntityState, used by every properties panel edit + the viewport resize handles
 class PropertyChangeCommand : public Command {
     Engine::Entity* m_entity;
     EntityState m_oldState, m_newState;
@@ -104,7 +99,6 @@ public:
     std::string description() const override;
 };
 
-// bundles N commands into one undo step — multi-select delete is N DeleteEntityCommands wrapped in one of these. undo runs in reverse
 class CompoundCommand : public Command {
     std::vector<std::unique_ptr<Command>> m_commands;
     std::string m_desc;

@@ -6,7 +6,6 @@
 
 namespace Editor {
 
-// consume = read/reset/return. panel never mutates EntityManager directly, so every action ends up going thru the undo stack via EditorApplication
 Engine::Entity* ScenePanel::consumeDeleteRequest() {
     auto* e = m_deleteRequest;
     m_deleteRequest = nullptr;
@@ -37,7 +36,6 @@ Engine::Entity* ScenePanel::consumeMoveDownRequest() {
     return e;
 }
 
-// filter box + entity list w/ icons + context menu + overlap tooltip. `playing` disables destructive menu items while the game runs
 void ScenePanel::render(Engine::EntityManager& mgr,
                         std::vector<Engine::Entity*>& selection,
                         Engine::Entity*& primary,
@@ -50,7 +48,6 @@ void ScenePanel::render(Engine::EntityManager& mgr,
     ImGui::Text("Entities");
     ImGui::Separator();
 
-    // case-insensitive name filter, X button only appears when filter isnt empty
     char buf[128] = {0};
     snprintf(buf, sizeof(buf), "%s", m_filter.c_str());
     float clearBtnW = m_filter.empty() ? 0.f : 22.f;
@@ -94,7 +91,6 @@ void ScenePanel::render(Engine::EntityManager& mgr,
 
                 ImGui::PushID(e);
 
-                // icon + colour come from EntityTypeRegistry — one table drives every panel, cant drift
                 const char* icon = "[-]";
                 ImVec4 col{1, 1, 1, 1};
                 if (const auto* info = Engine::findEntityType(e->type)) {
@@ -134,7 +130,6 @@ void ScenePanel::render(Engine::EntityManager& mgr,
                     ImGui::EndPopup();
                 }
 
-                // tooltip flags ONE overlapping neighbour — O(n) but only runs once per frame for the hovered row
                 if (ImGui::IsItemHovered()) {
                     ImGui::BeginTooltip();
                     ImGui::Text("Type: %s", e->type.c_str());

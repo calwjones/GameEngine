@@ -16,24 +16,14 @@
 
 namespace Engine {
 
-// VIVA POINT: this is the "one table to rule them all" thing i was talking about.
-// originally i had the entity type knowledge spread across 4 files — EditorApplication
-// registered constructors, ScenePanel hardcoded icons, PropertiesPanel had the type
-// dropdown, EntityPalette hardcoded colours. every new type = edit 4 places + forget
-// one + crash. now its ONE table and every place that needs to know just reads it.
-//
-// each row = {typeString, label, icon, r, g, b, ctor}. ctor is nullptr for
-// "default"/"platform" (the base Entity is used directly, no subclass) and
-// also for "projectile" which is registered separately bc its runtime-only.
 struct EntityTypeInfo {
-    const char* type;            // machine key, stored on Entity::type + in JSON
-    const char* label;           // human label for dropdowns
-    const char* icon;             // little bracket tag in ScenePanel — "[P]" for player etc
-    float r, g, b;                // colour 0..1. floats bc ImGui wants floats, not sf::Color bytes
-    Entity* (*create)();          // factory fn ptr. nullptr = no subclass, use base Entity
+    const char* type;
+    const char* label;
+    const char* icon;
+    float r, g, b;
+    Entity* (*create)();
 };
 
-// the order of rows = the order u see in the PropertiesPanel "Type" combobox
 inline constexpr std::array<EntityTypeInfo, 10> kEntityTypes = {{
     {"default",         "Default",         "[-]", 1.00f, 1.00f, 1.00f, nullptr},
     {"player",          "Player",          "[P]", 0.20f, 0.80f, 0.20f, []() -> Entity* { return new Game::Player(); }},
@@ -47,8 +37,6 @@ inline constexpr std::array<EntityTypeInfo, 10> kEntityTypes = {{
     {"hazard",          "Hazard",          "[X]", 0.70f, 0.70f, 0.80f, []() -> Entity* { return new Game::Hazard(); }},
 }};
 
-// manual strcmp loop bc constexpr cant use <cstring>. returns nullptr if not found.
-// yes this is O(n*len) but n=10 so who cares lol
 inline const EntityTypeInfo* findEntityType(const char* type) {
     if (!type) return nullptr;
     for (const auto& info : kEntityTypes) {
@@ -63,8 +51,6 @@ inline const EntityTypeInfo* findEntityType(const std::string& type) {
     return findEntityType(type.c_str());
 }
 
-// registers every type with a non-null create fn against the given factory.
-// projectile is deliberately skipped - its only ever spawned by ShootingEnemy at runtime.
 inline void registerBuiltinTypes(EntityFactory& factory) {
     for (const auto& info : kEntityTypes) {
         if (!info.create) continue;

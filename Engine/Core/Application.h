@@ -8,14 +8,13 @@
 
 namespace Engine {
 
-// bag of subsystems — entities, physics, collision, input. used to have its own run()/update() loop for standalone mode but killed it, editor drives everything now
 class Application {
     EntityManager m_entities;
     PhysicsEngine m_physics;
     CollisionSystem m_collision;
     InputManager m_input;
 
-    sf::RenderWindow* m_window = nullptr;   // borrowed, editor owns the window
+    sf::RenderWindow* m_window = nullptr;
     unsigned int m_width = 800, m_height = 600;
     bool m_initialized = false;
 

@@ -21,7 +21,6 @@ std::vector<Entity*> LevelLoader::loadFromJSON(const std::string& path) {
     doc.Parse(buf.str().c_str());
     if (doc.HasParseError()) { m_error = "JSON parse error"; return entities; }
 
-    // level dimensions — fall back to old default if missing so old JSON still loads
     m_width = 800.f;
     m_height = 600.f;
     if (doc.HasMember("width") && doc["width"].IsNumber()) m_width = doc["width"].GetFloat();
@@ -30,19 +29,13 @@ std::vector<Entity*> LevelLoader::loadFromJSON(const std::string& path) {
     if (!doc.HasMember("entities") || !doc["entities"].IsArray()) { m_error = "Missing entities array"; return entities; }
 
     for (auto& j : doc["entities"].GetArray()) {
-        // read 'type' FIRST bc the factory needs it to pick the right subclass ctor
         std::string typeStr = "default";
         if (j.HasMember("type") && j["type"].IsString()) typeStr = j["type"].GetString();
 
-        // factory returns new Player()/Enemy()/etc. if type is unknown falls back
-        // to base Entity — means old levels w/ deleted types still load, just inert
         Entity* e = m_factory ? m_factory->create(typeStr) : new Entity();
         if (j.HasMember("name") && j["name"].IsString()) e->name = j["name"].GetString();
         e->type = typeStr;
 
-        // every field is guarded with HasMember+type check — malformed JSON falls
-        // back to whatever defaults the Entity ctor set. annoying boilerplate but
-        // means u can hand-edit levels without crashing the loader every typo
         if (j.HasMember("position") && j["position"].IsObject()) {
             auto& p = j["position"];
             if (p.HasMember("x") && p["x"].IsNumber()) e->position.x = p["x"].GetFloat();
@@ -72,10 +65,6 @@ std::vector<Entity*> LevelLoader::loadFromJSON(const std::string& path) {
         if (j.HasMember("texturePath") && j["texturePath"].IsString())
             e->texturePath = j["texturePath"].GetString();
 
-        // the "properties" sidecar — subclass stuff like patrol speed, fire rate,
-        // Goal.nextLevel. we iterate the JSON object + split members into 2 maps
-        // (float + string) by value type, then hand each to the matching virtual.
-        // subclasses only need to impl the type(s) they actually use
         if (j.HasMember("properties") && j["properties"].IsObject()) {
             Entity::Properties props;
             Entity::StringProperties stringProps;
@@ -133,9 +122,6 @@ bool LevelLoader::saveToJSON(const std::string& path, const std::vector<Entity*>
         if (!e->texturePath.empty())
             obj.AddMember("texturePath", rapidjson::Value(e->texturePath.c_str(), alloc), alloc);
 
-        // mirror of the load path: ask each entity for its numeric + string
-        // props, merge into one "properties" object. skip the whole block if
-        // both maps are empty (no sense writing "properties": {})
         auto props = e->serializeProperties();
         auto stringProps = e->serializeStringProperties();
         if (!props.empty() || !stringProps.empty()) {

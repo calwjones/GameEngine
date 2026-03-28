@@ -29,23 +29,17 @@ bool LevelGroupLoader::loadFromJSON(const std::string& path, LevelGroup& out) {
         }
     }
 
-    // id comes from filename — "guided_tour.json" -> "guided_tour". stable even
-    // if the author renames the display name. if manifest has no name we just
-    // reuse the id so the Level Browser has something to show
     std::filesystem::path p(path);
     out.id = p.stem().string();
     if (out.name.empty()) out.name = out.id;
 
-    // empty levels[] = invalid manifest, reject it
     return !out.levels.empty();
 }
 
-// walks a directory, tries to load every .json as a group, alphabetizes by name.
-// used once at editor startup to populate the Worlds section of the Level Browser
 std::vector<LevelGroup> LevelGroupLoader::scanDirectory(const std::string& dir) {
     std::vector<LevelGroup> groups;
     namespace fs = std::filesystem;
-    if (!fs::exists(dir)) return groups;   // dir doesnt exist yet = no groups, fine
+    if (!fs::exists(dir)) return groups;
 
     for (auto& entry : fs::directory_iterator(dir)) {
         if (!entry.is_regular_file()) continue;
@@ -55,7 +49,6 @@ std::vector<LevelGroup> LevelGroupLoader::scanDirectory(const std::string& dir) 
         if (loadFromJSON(entry.path().string(), g))
             groups.push_back(std::move(g));
     }
-    // sort so the picker isnt in filesystem order (which is basically random on some OSes)
     std::sort(groups.begin(), groups.end(),
               [](const LevelGroup& a, const LevelGroup& b) { return a.name < b.name; });
     return groups;

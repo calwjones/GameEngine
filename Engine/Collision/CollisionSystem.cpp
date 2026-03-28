@@ -6,15 +6,7 @@
 
 namespace Engine {
 
-// VIVA: this is the classic "minimum translation vector" / min-penetration-axis trick.
-// idea: if two rects overlap, we want to push them apart along whichever
-// axis has the LEAST overlap (bc thats the axis where they barely missed).
-//
-// math:
-//   ox = overlap on x axis = (hwa + hwb) - |cA.x - cB.x|     ("sum of half widths" minus "center distance")
-//   oy = overlap on y axis = (hha + hhb) - |cA.y - cB.y|
-// if both > 0 they're overlapping. pick the smaller one as push axis.
-// sign of dx/dy tells us which SIDE b got hit on (left vs right, top vs bot)
+// minimum translation vector: push out on whichever axis has less overlap
 CollisionSystem::Result CollisionSystem::checkDetailed(const Entity& a, const Entity& b) const {
     Result r;
     sf::Vector2f cA = a.getCenter(), cB = b.getCenter();
@@ -25,7 +17,6 @@ CollisionSystem::Result CollisionSystem::checkDetailed(const Entity& a, const En
 
     if (ox > 0 && oy > 0) {
         r.collided = true;
-        // push out the SHORT way — if ox < oy we were barely poking in on x
         if (ox < oy) {
             r.penetration = ox;
             r.side = dx > 0 ? Side::LEFT : Side::RIGHT;
@@ -39,25 +30,18 @@ CollisionSystem::Result CollisionSystem::checkDetailed(const Entity& a, const En
     return r;
 }
 
-// actually un-overlaps the two entities + kills their velocity on the hit axis.
-// returns what side got hit so callers can react (player uses TOP for "im grounded")
 CollisionSystem::Side CollisionSystem::resolveCollision(Entity& moving, Entity& other) {
-    if (moving.isTrigger || other.isTrigger) return Side::NONE;   // triggers just overlap, never block
+    if (moving.isTrigger || other.isTrigger) return Side::NONE;
 
     auto r = checkDetailed(moving, other);
     if (!r.collided) return Side::NONE;
 
-    // only move the non-static one. if both static (eg ground vs wall) do nothing.
-    // if both dynamic we just move 'moving' for simplicity
     Entity* target = !moving.isStatic ? &moving : (!other.isStatic ? &other : nullptr);
     if (!target) return r.side;
 
-    // flip normal if we're pushing 'other' instead of 'moving' bc the normal is from moving's POV
     sf::Vector2f n = (target == &moving) ? r.normal : -r.normal;
     target->position += n * r.penetration;
 
-    // kill velocity on the axis we just hit so we dont re-collide next frame.
-    // also set isOnGround if this was a top-landing (player jump logic keys off this)
     if (r.side == Side::TOP || r.side == Side::BOTTOM) {
         target->velocity.y = 0.f;
         if ((target == &moving && r.side == Side::BOTTOM) ||
@@ -69,15 +53,10 @@ CollisionSystem::Side CollisionSystem::resolveCollision(Entity& moving, Entity& 
     return r.side;
 }
 
-// BROAD PHASE. builds the spatial hash grid then walks each cell looking for pairs.
-// a big entity can straddle several cells — thats fine, we just insert it into
-// all of em. means a pair can show up in multiple cells if both entities overlap
-// multiple cells together. we dedupe that with the 'checked' set below.
 void CollisionSystem::findPotentialPairs(const std::vector<Entity*>& entities,
                                           std::function<void(Entity&, Entity&)> callback) {
     m_grid.clear();
 
-    // bucket every entity into the cells it touches
     for (auto* e : entities) {
         int minX = (int)std::floor(e->position.x / m_cellSize);
         int minY = (int)std::floor(e->position.y / m_cellSize);
@@ -89,13 +68,7 @@ void CollisionSystem::findPotentialPairs(const std::vector<Entity*>& entities,
                 m_grid[{cx, cy}].push_back(e);
     }
 
-    // VIVA — subtle UB bug i fixed. to dedupe pairs i need a canonical (a,b) order
-    // so {X,Y} and {Y,X} hash the same. i was originally using `a > b` on the raw
-    // ptrs — BUT comparing pointers to different allocations with > is undefined
-    // behaviour per the C++ standard. works on every real allocator tho, so the
-    // bug was invisible. std::less<Entity*> explicitly gives u a defined total
-    // order even across unrelated allocs. also using unordered_set instead of set
-    // bc unordered_set uses a hash bucket (no per-frame rbtree allocations)
+    // std::less gives a defined total order across unrelated allocations
     struct PairHash {
         size_t operator()(const std::pair<Entity*, Entity*>& p) const noexcept {
             auto h1 = std::hash<Entity*>()(p.first);

@@ -6,13 +6,6 @@
 
 namespace Engine {
 
-// classic factory pattern. JSON loader sees "type": "enemy" and needs to new
-// up a Game::Enemy — but Engine/ cant depend on Game/ (layering), so we flip
-// it: Game/ REGISTERS its constructors here at startup + loader looks em up.
-//
-// side effect: adding a new entity type = 1 line in EditorApplication::initialize()
-// (the registerType call) + a subclass file. everything else (palette, scene
-// panel, serialization) picks it up automatically via EntityTypeRegistry
 class EntityFactory {
     std::unordered_map<std::string, std::function<Entity*()>> m_creators;
 
@@ -25,8 +18,7 @@ public:
         auto it = m_creators.find(type);
         if (it != m_creators.end())
             return it->second();
-        // unknown type — make a plain Entity so the level still loads.
-        // means old JSON w/ deleted types still opens, just loses behaviour
+        // fall back so old levels still load
         auto* e = new Entity();
         e->type = type;
         return e;
