@@ -33,11 +33,8 @@ Makefile
 *.ilk
 *.exp
 
-# External libraries (downloaded by setup script)
-# Uncomment if you want to exclude external dependencies
-# external/imgui/
-# external/imgui-sfml/
-# external/rapidjson/
+# External libraries
+external/
 
 # OS files
 .DS_Store
