@@ -29,16 +29,20 @@ The editor lets you build platformer levels by placing and configuring entities 
 
 ## Building
 
+The project uses CMake's `FetchContent` to automatically download and configure dependencies (ImGui, ImGui-SFML, RapidJSON). You only need to have SFML 2.x installed on your system.
+
 **macOS (Homebrew)**
 ```bash
 brew install sfml@2
-cmake -B build && cmake --build build
+cmake -B build
+cmake --build build
 ./build/GameEngine
 ```
 
 **Windows (Visual Studio)**
+Ensure you have SFML 2.x installed. If SFML is not in a standard location, you can point CMake to it:
 ```powershell
-cmake -B build -DSFML_DIR="external/SFML/lib/cmake/SFML"
+cmake -B build -DSFML_DIR="C:/path/to/SFML/lib/cmake/SFML"
 cmake --build build --config Release
 .\build\Release\GameEngine.exe
 ```

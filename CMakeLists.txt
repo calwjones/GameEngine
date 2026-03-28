@@ -61,34 +61,6 @@ if(NOT SFML_FOUND)
 endif()
 find_package(OpenGL REQUIRED)
 
-set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/external/imgui)
-set(IMGUI_SFML_DIR ${CMAKE_SOURCE_DIR}/external/imgui-sfml)
-set(RAPIDJSON_DIR ${CMAKE_SOURCE_DIR}/external/rapidjson)
-
-if(NOT EXISTS "${IMGUI_DIR}/imgui.cpp")
-    message(FATAL_ERROR "ImGui not found in ${IMGUI_DIR}")
-endif()
-
-if(NOT EXISTS "${IMGUI_SFML_DIR}/imgui-SFML.cpp")
-    message(FATAL_ERROR "ImGui-SFML not found in ${IMGUI_SFML_DIR}")
-endif()
-
-if(NOT EXISTS "${RAPIDJSON_DIR}/include/rapidjson/document.h")
-    message(FATAL_ERROR "RapidJSON not found in ${RAPIDJSON_DIR}")
-endif()
-
-set(IMGUI_SOURCES
-    ${IMGUI_DIR}/imgui.cpp
-    ${IMGUI_DIR}/imgui_demo.cpp
-    ${IMGUI_DIR}/imgui_draw.cpp
-    ${IMGUI_DIR}/imgui_tables.cpp
-    ${IMGUI_DIR}/imgui_widgets.cpp
-)
-
-set(IMGUI_SFML_SOURCES
-    ${IMGUI_SFML_DIR}/imgui-SFML.cpp
-)
-
 set(ENGINE_SOURCES
     Engine/Core/GameLoop.cpp
     Engine/Core/Application.cpp
@@ -109,22 +81,53 @@ set(EDITOR_SOURCES
     Editor/EntityPalette.cpp
 )
 
-# Create executable (WIN32 flag hides console window on Windows)
+include(FetchContent)
+
+# 1. RapidJSON
+set(RAPIDJSON_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(RAPIDJSON_BUILD_DOC OFF CACHE BOOL "" FORCE)
+set(RAPIDJSON_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+
+FetchContent_Declare(
+    rapidjson
+    GIT_REPOSITORY https://github.com/Tencent/rapidjson.git
+    GIT_TAG master
+)
+FetchContent_MakeAvailable(rapidjson)
+
+# 2. Dear ImGui
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG v1.91.8
+)
+FetchContent_MakeAvailable(imgui)
+
+# 3. ImGui-SFML
+# We need to tell ImGui-SFML where Dear ImGui is
+set(IMGUI_DIR ${imgui_SOURCE_DIR})
+set(IMGUI_SFML_IMGUI_DIR ${imgui_SOURCE_DIR})
+set(IMGUI_SFML_FIND_SFML OFF) # We already found SFML
+
+FetchContent_Declare(
+    imgui_sfml
+    GIT_REPOSITORY https://github.com/SFML/imgui-sfml.git
+    GIT_TAG v2.6.1
+)
+FetchContent_MakeAvailable(imgui_sfml)
+
+# Create executable
 if(WIN32)
     add_executable(GameEngine WIN32
         main.cpp
         ${ENGINE_SOURCES}
         ${EDITOR_SOURCES}
-        ${IMGUI_SOURCES}
-        ${IMGUI_SFML_SOURCES}
     )
 else()
     add_executable(GameEngine
         main.cpp
         ${ENGINE_SOURCES}
         ${EDITOR_SOURCES}
-        ${IMGUI_SOURCES}
-        ${IMGUI_SFML_SOURCES}
     )
 endif()
 
@@ -138,9 +141,14 @@ endif()
 
 target_include_directories(GameEngine PRIVATE
     ${CMAKE_SOURCE_DIR}
-    ${IMGUI_DIR}
-    ${IMGUI_SFML_DIR}
-    ${RAPIDJSON_DIR}/include
+    ${rapidjson_SOURCE_DIR}/include
+    ${imgui_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}/backends
+)
+
+# Link dependencies
+target_link_libraries(GameEngine PRIVATE
+    ImGui-SFML::ImGui-SFML
 )
 
 # Platform-specific linking
