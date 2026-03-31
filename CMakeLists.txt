@@ -79,6 +79,14 @@ set(EDITOR_SOURCES
     Editor/GameViewport.cpp
     Editor/CommandHistory.cpp
     Editor/EntityPalette.cpp
+    Editor/SelectionController.cpp
+    Editor/LevelIO.cpp
+    Editor/PlaySessionController.cpp
+    Editor/EntityOps.cpp
+    Editor/PopupRenderer.cpp
+    Editor/MenuBarRenderer.cpp
+    Editor/ToolbarRenderer.cpp
+    Editor/OverlayRenderer.cpp
 )
 
 include(FetchContent)
