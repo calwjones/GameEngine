@@ -70,6 +70,13 @@ set(ENGINE_SOURCES
     Engine/Gameplay/GameplaySystem.cpp
     Engine/Level/LevelLoader.cpp
     Engine/Level/LevelGroup.cpp
+    Engine/Audio/AudioManager.cpp
+    Engine/Physics/PhysicsEngine.cpp
+    Engine/Input/InputManager.cpp
+    Engine/State/StateManager.cpp
+    Engine/Rendering/Camera.cpp
+    Engine/Rendering/Renderer.cpp
+    Engine/Rendering/TextureManager.cpp
 )
 
 set(EDITOR_SOURCES
