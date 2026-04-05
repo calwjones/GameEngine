@@ -8,12 +8,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Export compile commands for IDE support
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
+
+option(BUILD_TESTS "Build unit tests" ON)
 
 # Platform detection
 if(WIN32)
@@ -26,13 +27,11 @@ endif()
 
 # SFML setup - platform-specific paths
 if(WIN32)
-    # Windows: Use bundled SFML from external directory
     if(EXISTS "${CMAKE_SOURCE_DIR}/external/SFML/lib/cmake/SFML/SFMLConfig.cmake")
         set(SFML_DIR ${CMAKE_SOURCE_DIR}/external/SFML/lib/cmake/SFML)
         message(STATUS "Using bundled SFML from external/SFML")
     endif()
 elseif(APPLE)
-    # macOS: Check Homebrew locations
     if(EXISTS "/opt/homebrew/Cellar/sfml@2")
         file(GLOB SFML_HOMEBREW_PATHS "/opt/homebrew/Cellar/sfml@2/*/lib/cmake/SFML")
         if(SFML_HOMEBREW_PATHS)
@@ -61,41 +60,6 @@ if(NOT SFML_FOUND)
 endif()
 find_package(OpenGL REQUIRED)
 
-set(ENGINE_SOURCES
-    Engine/Core/GameLoop.cpp
-    Engine/Core/Application.cpp
-    Engine/Entity/Entity.cpp
-    Engine/Entity/EntityManager.cpp
-    Engine/Collision/CollisionSystem.cpp
-    Engine/Gameplay/GameplaySystem.cpp
-    Engine/Level/LevelLoader.cpp
-    Engine/Level/LevelGroup.cpp
-    Engine/Audio/AudioManager.cpp
-    Engine/Physics/PhysicsEngine.cpp
-    Engine/Input/InputManager.cpp
-    Engine/State/StateManager.cpp
-    Engine/Rendering/Camera.cpp
-    Engine/Rendering/Renderer.cpp
-    Engine/Rendering/TextureManager.cpp
-)
-
-set(EDITOR_SOURCES
-    Editor/EditorApplication.cpp
-    Editor/ScenePanel.cpp
-    Editor/PropertiesPanel.cpp
-    Editor/GameViewport.cpp
-    Editor/CommandHistory.cpp
-    Editor/EntityPalette.cpp
-    Editor/SelectionController.cpp
-    Editor/LevelIO.cpp
-    Editor/PlaySessionController.cpp
-    Editor/EntityOps.cpp
-    Editor/PopupRenderer.cpp
-    Editor/MenuBarRenderer.cpp
-    Editor/ToolbarRenderer.cpp
-    Editor/OverlayRenderer.cpp
-)
-
 include(FetchContent)
 
 # 1. RapidJSON
@@ -119,10 +83,9 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(imgui)
 
 # 3. ImGui-SFML
-# We need to tell ImGui-SFML where Dear ImGui is
 set(IMGUI_DIR ${imgui_SOURCE_DIR})
 set(IMGUI_SFML_IMGUI_DIR ${imgui_SOURCE_DIR})
-set(IMGUI_SFML_FIND_SFML OFF) # We already found SFML
+set(IMGUI_SFML_FIND_SFML OFF)
 
 FetchContent_Declare(
     imgui_sfml
@@ -131,22 +94,86 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(imgui_sfml)
 
-# Create executable
-if(WIN32)
-    add_executable(GameEngine WIN32
-        main.cpp
-        ${ENGINE_SOURCES}
-        ${EDITOR_SOURCES}
-    )
+# ---------------------------------------------------------------------------
+# GameEngineCore static library - shared by editor, runtime, and tests
+# ---------------------------------------------------------------------------
+set(ENGINE_SOURCES
+    Engine/Core/GameLoop.cpp
+    Engine/Core/Application.cpp
+    Engine/Entity/Entity.cpp
+    Engine/Entity/EntityManager.cpp
+    Engine/Collision/CollisionSystem.cpp
+    Engine/Gameplay/GameplaySystem.cpp
+    Engine/Level/LevelLoader.cpp
+    Engine/Level/LevelGroup.cpp
+    Engine/Audio/AudioManager.cpp
+    Engine/Physics/PhysicsEngine.cpp
+    Engine/Input/InputManager.cpp
+    Engine/State/StateManager.cpp
+    Engine/Rendering/Camera.cpp
+    Engine/Rendering/Renderer.cpp
+    Engine/Rendering/TextureManager.cpp
+)
+
+add_library(GameEngineCore STATIC ${ENGINE_SOURCES})
+
+target_include_directories(GameEngineCore PUBLIC
+    ${CMAKE_SOURCE_DIR}
+    ${rapidjson_SOURCE_DIR}/include
+)
+
+target_link_libraries(GameEngineCore PUBLIC
+    sfml-graphics
+    sfml-window
+    sfml-system
+    OpenGL::GL
+)
+
+if(TARGET sfml-audio)
+    target_link_libraries(GameEngineCore PUBLIC sfml-audio)
+    target_compile_definitions(GameEngineCore PUBLIC HAS_SFML_AUDIO)
+    message(STATUS "SFML Audio: Found")
 else()
-    add_executable(GameEngine
-        main.cpp
-        ${ENGINE_SOURCES}
-        ${EDITOR_SOURCES}
+    message(STATUS "SFML Audio: Not found (audio features disabled)")
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
+    target_compile_options(GameEngineCore PRIVATE
+        -Wall -Wextra -Wpedantic
+        -Wno-deprecated-declarations
+    )
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(GameEngineCore PRIVATE
+        -Wall -Wextra -Wpedantic
     )
 endif()
 
-# macOS: Create app bundle structure
+# ---------------------------------------------------------------------------
+# GameEngine editor executable
+# ---------------------------------------------------------------------------
+set(EDITOR_SOURCES
+    Editor/EditorApplication.cpp
+    Editor/ScenePanel.cpp
+    Editor/PropertiesPanel.cpp
+    Editor/GameViewport.cpp
+    Editor/CommandHistory.cpp
+    Editor/EntityPalette.cpp
+    Editor/SelectionController.cpp
+    Editor/LevelIO.cpp
+    Editor/PlaySessionController.cpp
+    Editor/EntityOps.cpp
+    Editor/PopupRenderer.cpp
+    Editor/MenuBarRenderer.cpp
+    Editor/ToolbarRenderer.cpp
+    Editor/OverlayRenderer.cpp
+)
+
+if(WIN32)
+    add_executable(GameEngine WIN32 main.cpp ${EDITOR_SOURCES})
+else()
+    add_executable(GameEngine main.cpp ${EDITOR_SOURCES})
+endif()
+
 if(APPLE)
     set_target_properties(GameEngine PROPERTIES
         MACOSX_BUNDLE FALSE
@@ -155,46 +182,25 @@ if(APPLE)
 endif()
 
 target_include_directories(GameEngine PRIVATE
-    ${CMAKE_SOURCE_DIR}
-    ${rapidjson_SOURCE_DIR}/include
     ${imgui_SOURCE_DIR}
     ${imgui_SOURCE_DIR}/backends
 )
 
-# Link dependencies
 target_link_libraries(GameEngine PRIVATE
+    GameEngineCore
     ImGui-SFML::ImGui-SFML
 )
 
-# Platform-specific linking
 if(APPLE)
-    # macOS: Link against frameworks
     find_library(COCOA_LIBRARY Cocoa REQUIRED)
     find_library(IOKIT_LIBRARY IOKit REQUIRED)
     find_library(COREVIDEO_LIBRARY CoreVideo REQUIRED)
     target_link_libraries(GameEngine PRIVATE
-        sfml-graphics
-        sfml-window
-        sfml-system
-        OpenGL::GL
         ${COCOA_LIBRARY}
         ${IOKIT_LIBRARY}
         ${COREVIDEO_LIBRARY}
     )
-    if(TARGET sfml-audio)
-        target_link_libraries(GameEngine PRIVATE sfml-audio)
-    endif()
 elseif(WIN32)
-    target_link_libraries(GameEngine PRIVATE
-        sfml-graphics
-        sfml-window
-        sfml-system
-        OpenGL::GL
-    )
-    if(TARGET sfml-audio)
-        target_link_libraries(GameEngine PRIVATE sfml-audio)
-    endif()
-    # Copy SFML DLLs to output directory
     add_custom_command(TARGET GameEngine POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             $<TARGET_FILE:sfml-graphics>
@@ -202,7 +208,6 @@ elseif(WIN32)
             $<TARGET_FILE:sfml-system>
             $<TARGET_FILE_DIR:GameEngine>
     )
-    # Also copy OpenAL DLL if SFML audio is used
     if(TARGET sfml-audio)
         add_custom_command(TARGET GameEngine POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -210,25 +215,6 @@ elseif(WIN32)
                 $<TARGET_FILE_DIR:GameEngine>
         )
     endif()
-else()
-    # Linux/Unix
-    target_link_libraries(GameEngine PRIVATE
-        sfml-graphics
-        sfml-window
-        sfml-system
-        OpenGL::GL
-    )
-    if(TARGET sfml-audio)
-        target_link_libraries(GameEngine PRIVATE sfml-audio)
-    endif()
-endif()
-
-# Enable audio features if sfml-audio is available
-if(TARGET sfml-audio)
-    target_compile_definitions(GameEngine PRIVATE HAS_SFML_AUDIO)
-    message(STATUS "SFML Audio: Found")
-else()
-    message(STATUS "SFML Audio: Not found (audio features disabled)")
 endif()
 
 add_custom_command(TARGET GameEngine POST_BUILD
@@ -237,19 +223,13 @@ add_custom_command(TARGET GameEngine POST_BUILD
         $<TARGET_FILE_DIR:GameEngine>/assets
 )
 
-# Compiler-specific options
 if(MSVC)
-    target_compile_options(GameEngine PRIVATE
-        /W3
-        /MP           # Multi-processor compilation
-        /utf-8        # UTF-8 source files
-    )
+    target_compile_options(GameEngine PRIVATE /W3 /MP /utf-8)
     target_compile_definitions(GameEngine PRIVATE
         _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
         _CRT_SECURE_NO_WARNINGS
-        NOMINMAX      # Prevent Windows.h min/max macros
+        NOMINMAX
     )
-    # Use WinMain entry point for GUI app
     set_target_properties(GameEngine PROPERTIES
         LINK_FLAGS "/ENTRY:mainCRTStartup"
     )
@@ -264,12 +244,20 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     )
 endif()
 
-# Install targets
 install(TARGETS GameEngine
     RUNTIME DESTINATION bin
     BUNDLE DESTINATION bin
 )
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets DESTINATION bin)
+
+# ---------------------------------------------------------------------------
+# Tests
+# ---------------------------------------------------------------------------
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
+
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "C++ compiler: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "SFML version: ${SFML_VERSION}")
