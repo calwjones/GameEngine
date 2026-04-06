@@ -118,6 +118,7 @@ private:
     bool pickMovingPlatformB(Engine::Entity* e, sf::Vector2f world) const;
     void drawGrid();
     void drawLevelBounds();
+    void clampViewOffset();
 };
 
 }

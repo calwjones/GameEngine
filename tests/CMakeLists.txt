@@ -16,6 +16,7 @@ add_executable(GameEngineTests
     test_entity_manager.cpp
     test_level_io.cpp
     test_gameplay.cpp
+    test_camera.cpp
     ${CMAKE_SOURCE_DIR}/Editor/CommandHistory.cpp
 )
 

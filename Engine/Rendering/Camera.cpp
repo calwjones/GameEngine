@@ -25,10 +25,18 @@ void Camera::clampToBounds() {
     if (!m_hasBounds) return;
     float halfW = m_viewW / 2.f;
     float halfH = m_viewH / 2.f;
-    m_position.x = std::clamp(m_position.x,
-        m_left + halfW, std::max(m_left + halfW, m_right - halfW));
-    m_position.y = std::clamp(m_position.y,
-        m_top + halfH, std::max(m_top + halfH, m_bottom - halfH));
+    float levelW = m_right - m_left;
+    float levelH = m_bottom - m_top;
+
+    if (m_viewW >= levelW)
+        m_position.x = (m_left + m_right) * 0.5f;
+    else
+        m_position.x = std::clamp(m_position.x, m_left + halfW, m_right - halfW);
+
+    if (m_viewH >= levelH)
+        m_position.y = (m_top + m_bottom) * 0.5f;
+    else
+        m_position.y = std::clamp(m_position.y, m_top + halfH, m_bottom - halfH);
 }
 
 }

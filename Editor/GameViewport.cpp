@@ -205,9 +205,23 @@ void GameViewport::drawLevelBounds() {
     sf::RectangleShape border(sf::Vector2f(m_levelWidth, m_levelHeight));
     border.setPosition(0.f, 0.f);
     border.setFillColor(sf::Color::Transparent);
-    border.setOutlineColor(sf::Color(255, 255, 255, 25));
-    border.setOutlineThickness(1.f / m_viewZoom);
+    border.setOutlineColor(sf::Color(120, 180, 255, 110));
+    border.setOutlineThickness(2.f / m_viewZoom);
     m_tex.draw(border);
+}
+
+void GameViewport::clampViewOffset() {
+    // always keep a sliver of the level in view so it can't be lost offscreen
+    constexpr float kMinVisible = 50.f;
+    float vw = viewW(), vh = viewH();
+    float minX = -vw + kMinVisible;
+    float maxX = m_levelWidth - kMinVisible;
+    float minY = -vh + kMinVisible;
+    float maxY = m_levelHeight - kMinVisible;
+    if (minX > maxX) { float m = (minX + maxX) * 0.5f; minX = maxX = m; }
+    if (minY > maxY) { float m = (minY + maxY) * 0.5f; minY = maxY = m; }
+    m_viewOffset.x = std::clamp(m_viewOffset.x, minX, maxX);
+    m_viewOffset.y = std::clamp(m_viewOffset.y, minY, maxY);
 }
 
 void GameViewport::drawGrid() {
@@ -262,6 +276,7 @@ void GameViewport::render(Engine::Application& app, bool running,
         m_tex.create(nw, nh);
     }
 
+    clampViewOffset();
     float vw = viewW(), vh = viewH();
     sf::View view(sf::FloatRect(m_viewOffset.x, m_viewOffset.y, vw, vh));
     m_tex.setView(view);
@@ -483,6 +498,7 @@ void GameViewport::render(Engine::Application& app, bool running,
             m_viewOffset.x = worldX - normX * newViewW;
             m_viewOffset.y = worldY - normY * newViewH;
             m_viewZoom = newZoom;
+            clampViewOffset();
         }
     }
 
@@ -493,6 +509,7 @@ void GameViewport::render(Engine::Application& app, bool running,
             float dy = (mouse.y - m_panStart.y) / m_imgH * vh;
             m_viewOffset.x = m_panOffsetStart.x - dx;
             m_viewOffset.y = m_panOffsetStart.y - dy;
+            clampViewOffset();
             float mdx = (mouse.x - m_panPrevMouse.x) / m_imgW * vw;
             float mdy = (mouse.y - m_panPrevMouse.y) / m_imgH * vh;
             m_panVelocity = {-mdx * 60.f, -mdy * 60.f};
@@ -505,6 +522,7 @@ void GameViewport::render(Engine::Application& app, bool running,
         float friction = 0.9f;
         m_viewOffset.x += m_panVelocity.x * (1.f / 60.f);
         m_viewOffset.y += m_panVelocity.y * (1.f / 60.f);
+        clampViewOffset();
         m_panVelocity.x *= friction;
         m_panVelocity.y *= friction;
         if (std::abs(m_panVelocity.x) < 0.5f && std::abs(m_panVelocity.y) < 0.5f)
@@ -529,6 +547,7 @@ void GameViewport::render(Engine::Application& app, bool running,
                 else if (m_imgX + m_imgW - mouse.x < edgeMargin) m_viewOffset.x += scrollSpeed;
                 if (mouse.y - m_imgY < edgeMargin) m_viewOffset.y -= scrollSpeed;
                 else if (m_imgY + m_imgH - mouse.y < edgeMargin) m_viewOffset.y += scrollSpeed;
+                clampViewOffset();
 
                 sf::Vector2f world = screenToWorld(mouse.x, mouse.y);
 

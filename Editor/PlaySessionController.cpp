@@ -62,6 +62,7 @@ void PlaySessionController::tick(float dt) {
     m_accumulator += std::min(dt, maxFrameTime);
 
     while (m_accumulator >= fixedDt) {
+        m_accumulator -= fixedDt;
         if (m_gameplay.won() || m_playOverlay != PlayOverlay::None) break;
 
         ctx.camera.setViewSize(ctx.viewport.viewW(), ctx.viewport.viewH());
@@ -98,7 +99,6 @@ void PlaySessionController::tick(float dt) {
         }
 
         ctx.viewport.setViewCenter(ctx.camera.getPosition());
-        m_accumulator -= fixedDt;
     }
 
     if (!m_pendingNextLevel.empty()) {
