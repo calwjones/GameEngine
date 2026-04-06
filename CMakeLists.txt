@@ -15,6 +15,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 option(BUILD_TESTS "Build unit tests" ON)
+option(BUILD_RUNTIME "Build standalone runtime executable" ON)
 
 # Platform detection
 if(WIN32)
@@ -249,6 +250,13 @@ install(TARGETS GameEngine
     BUNDLE DESTINATION bin
 )
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/assets DESTINATION bin)
+
+# ---------------------------------------------------------------------------
+# Standalone runtime executable (no editor, no ImGui)
+# ---------------------------------------------------------------------------
+if(BUILD_RUNTIME)
+    add_subdirectory(Runtime)
+endif()
 
 # ---------------------------------------------------------------------------
 # Tests
