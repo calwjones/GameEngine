@@ -114,6 +114,7 @@ set(ENGINE_SOURCES
     Engine/Rendering/Camera.cpp
     Engine/Rendering/Renderer.cpp
     Engine/Rendering/TextureManager.cpp
+    Engine/Tile/TileLayer.cpp
 )
 
 add_library(GameEngineCore STATIC ${ENGINE_SOURCES})

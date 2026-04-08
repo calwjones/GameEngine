@@ -5,6 +5,7 @@
 #include "../Physics/PhysicsEngine.h"
 #include "../Collision/CollisionSystem.h"
 #include "../Input/InputManager.h"
+#include "../Tile/TileLayer.h"
 
 namespace Engine {
 
@@ -13,6 +14,7 @@ class Application {
     PhysicsEngine m_physics;
     CollisionSystem m_collision;
     InputManager m_input;
+    TileLayer m_tiles;
 
     sf::RenderWindow* m_window = nullptr;
     unsigned int m_width = 800, m_height = 600;
@@ -29,6 +31,8 @@ public:
     PhysicsEngine& getPhysics() { return m_physics; }
     CollisionSystem& getCollision() { return m_collision; }
     InputManager& getInput() { return m_input; }
+    TileLayer& getTiles() { return m_tiles; }
+    const TileLayer& getTiles() const { return m_tiles; }
 
     sf::RenderWindow* getWindow() { return m_window; }
     unsigned int getWidth() const { return m_width; }
