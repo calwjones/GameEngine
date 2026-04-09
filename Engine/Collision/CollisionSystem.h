@@ -6,6 +6,8 @@
 
 namespace Engine {
 
+class TileLayer;
+
 // AABB collision with a spatial hash broad phase
 class CollisionSystem {
 public:
@@ -25,6 +27,12 @@ public:
     Result checkDetailed(const Entity& a, const Entity& b) const;
 
     Side resolveCollision(Entity& moving, Entity& other);
+
+    // Resolve entity against all solid cells in the tile layer. Pushes the entity
+    // out on the minimum-translation axis per cell, zeros velocity on the resolved
+    // axis, and sets isOnGround when landing on a cell top. Returns the last side
+    // hit (NONE if no solid cells overlapped).
+    Side resolveTileCollision(Entity& e, const TileLayer& tiles);
 
     bool pointInEntity(const sf::Vector2f& p, const Entity& e) const {
         return p.x >= e.position.x && p.x <= e.position.x + e.size.x &&

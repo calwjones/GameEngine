@@ -91,6 +91,18 @@ void GameplaySystem::tick(float fixedDt) {
         e->update(fixedDt);
     }
 
+    // Tile collision — only gravity-driven dynamic entities. Flying enemies,
+    // projectiles, and moving platforms pass through tiles by design.
+    {
+        const auto& tiles = m_cfg.app->getTiles();
+        if (tiles.width() > 0 && tiles.height() > 0) {
+            for (auto* e : ents) {
+                if (e->isStatic || !e->hasGravity || e->isTrigger) continue;
+                collision.resolveTileCollision(*e, tiles);
+            }
+        }
+    }
+
     // rising edge → jump sfx
     if (m_player && m_playerWasOnGround && m_player->velocity.y < 0)
         m_cfg.audio->playSound("jump");
