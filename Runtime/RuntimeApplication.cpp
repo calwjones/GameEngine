@@ -55,7 +55,8 @@ bool RuntimeApplication::initialize(const LaunchOptions& opts) {
 }
 
 bool RuntimeApplication::loadLevel(const std::string& path) {
-    auto ents = m_loader.loadFromJSON(path);
+    m_app.getTiles().clear();
+    auto ents = m_loader.loadFromJSON(path, &m_app.getTiles());
     if (ents.empty()) return false;
 
     m_app.getEntityManager().clear();

@@ -1,4 +1,5 @@
 #include "LevelLoader.h"
+#include "../Tile/TileLayer.h"
 #include <rapidjson/document.h>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>
@@ -7,7 +8,7 @@
 
 namespace Engine {
 
-std::vector<Entity*> LevelLoader::loadFromJSON(const std::string& path) {
+std::vector<Entity*> LevelLoader::loadFromJSON(const std::string& path, TileLayer* outTiles) {
     std::vector<Entity*> entities;
     m_error.clear();
 
@@ -79,10 +80,31 @@ std::vector<Entity*> LevelLoader::loadFromJSON(const std::string& path) {
         }
         entities.push_back(e);
     }
+
+    if (outTiles) {
+        outTiles->resize(0, 0, outTiles->cellSize() > 0.f ? outTiles->cellSize() : 32.f);
+        if (doc.HasMember("tiles") && doc["tiles"].IsObject()) {
+            const auto& t = doc["tiles"];
+            int tw = (t.HasMember("width")  && t["width"].IsInt())    ? t["width"].GetInt()    : 0;
+            int th = (t.HasMember("height") && t["height"].IsInt())   ? t["height"].GetInt()   : 0;
+            float cs = (t.HasMember("cellSize") && t["cellSize"].IsNumber()) ? t["cellSize"].GetFloat() : 32.f;
+            if (tw > 0 && th > 0 && cs > 0.f) {
+                outTiles->resize(tw, th, cs);
+                if (t.HasMember("cells") && t["cells"].IsArray()) {
+                    const auto& arr = t["cells"].GetArray();
+                    auto& cells = outTiles->cells();
+                    size_t n = std::min<size_t>(cells.size(), arr.Size());
+                    for (size_t i = 0; i < n; ++i)
+                        if (arr[(rapidjson::SizeType)i].IsInt())
+                            cells[i] = arr[(rapidjson::SizeType)i].GetInt();
+                }
+            }
+        }
+    }
     return entities;
 }
 
-bool LevelLoader::saveToJSON(const std::string& path, const std::vector<Entity*>& entities, float width, float height) {
+bool LevelLoader::saveToJSON(const std::string& path, const std::vector<Entity*>& entities, float width, float height, const TileLayer* tiles) {
     m_error.clear();
     rapidjson::Document doc;
     doc.SetObject();
@@ -143,6 +165,18 @@ bool LevelLoader::saveToJSON(const std::string& path, const std::vector<Entity*>
     doc.AddMember("entities", arr, alloc);
     doc.AddMember("width", width, alloc);
     doc.AddMember("height", height, alloc);
+
+    if (tiles && tiles->width() > 0 && tiles->height() > 0) {
+        rapidjson::Value tileObj(rapidjson::kObjectType);
+        tileObj.AddMember("width", tiles->width(), alloc);
+        tileObj.AddMember("height", tiles->height(), alloc);
+        tileObj.AddMember("cellSize", tiles->cellSize(), alloc);
+        rapidjson::Value cellArr(rapidjson::kArrayType);
+        cellArr.Reserve((rapidjson::SizeType)tiles->cells().size(), alloc);
+        for (int v : tiles->cells()) cellArr.PushBack(v, alloc);
+        tileObj.AddMember("cells", cellArr, alloc);
+        doc.AddMember("tiles", tileObj, alloc);
+    }
 
     std::ofstream file(path);
     if (!file) { m_error = "Failed to write: " + path; return false; }

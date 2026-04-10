@@ -26,7 +26,8 @@ void LevelIO::loadLevel(const std::string& path) {
         ctx.selection->setPlayer(nullptr);
     }
 
-    auto entities = ctx.loader.loadFromJSON(path);
+    ctx.game.getTiles().clear();
+    auto entities = ctx.loader.loadFromJSON(path, &ctx.game.getTiles());
     if (entities.empty() && !ctx.loader.getLastError().empty()) {
         ctx.setStatus("Load failed!");
         std::cerr << "Load failed: " << ctx.loader.getLastError() << std::endl;
@@ -68,7 +69,7 @@ void LevelIO::saveLevel() {
     if (m_levelPath.empty()) return;
     if (ctx.loader.saveToJSON(m_levelPath,
                               ctx.game.getEntityManager().getAllEntities(),
-                              m_levelWidth, m_levelHeight)) {
+                              m_levelWidth, m_levelHeight, &ctx.game.getTiles())) {
         ctx.dirty = false;
         auto pos = m_levelPath.find_last_of('/');
         std::string name = (pos != std::string::npos) ? m_levelPath.substr(pos + 1) : m_levelPath;
@@ -85,7 +86,7 @@ void LevelIO::saveLevelAs(const std::string& filename) {
     m_levelPath = "assets/levels/" + filename;
     if (ctx.loader.saveToJSON(m_levelPath,
                               ctx.game.getEntityManager().getAllEntities(),
-                              m_levelWidth, m_levelHeight)) {
+                              m_levelWidth, m_levelHeight, &ctx.game.getTiles())) {
         ctx.dirty = false;
         updateWindowTitle();
         scanLevelFiles();
@@ -140,6 +141,7 @@ void LevelIO::fitLevelToContent() {
 void LevelIO::resetToNewLevel() {
     ctx.history.clear();
     ctx.game.getEntityManager().clear();
+    ctx.game.getTiles().clear();
     if (ctx.selection) {
         ctx.selection->clear();
         ctx.selection->setPlayer(nullptr);
