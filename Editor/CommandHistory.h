@@ -1,6 +1,7 @@
 #pragma once
 #include "../Engine/Entity/Entity.h"
 #include "../Engine/Entity/EntityManager.h"
+#include "../Engine/Tile/TileLayer.h"
 #include <vector>
 #include <memory>
 #include <string>
@@ -97,6 +98,26 @@ public:
     void execute() override;
     void undo() override;
     std::string description() const override;
+};
+
+class PaintTilesCommand : public Command {
+public:
+    struct Edit { int cx, cy, oldId, newId; };
+private:
+    Engine::TileLayer* m_tiles;
+    std::vector<Edit> m_edits;
+public:
+    PaintTilesCommand(Engine::TileLayer* tiles, std::vector<Edit> edits)
+        : m_tiles(tiles), m_edits(std::move(edits)) {}
+    void execute() override {
+        for (const auto& e : m_edits) m_tiles->set(e.cx, e.cy, e.newId);
+    }
+    void undo() override {
+        for (const auto& e : m_edits) m_tiles->set(e.cx, e.cy, e.oldId);
+    }
+    std::string description() const override {
+        return "Paint tiles (" + std::to_string(m_edits.size()) + ")";
+    }
 };
 
 class CompoundCommand : public Command {

@@ -326,6 +326,16 @@ void EditorApplication::renderImGui() {
         markDirty();
     }
 
+    std::vector<Editor::PaintEdit> paintEdits;
+    if (m_viewport.consumePaintComplete(paintEdits)) {
+        std::vector<PaintTilesCommand::Edit> cmdEdits;
+        cmdEdits.reserve(paintEdits.size());
+        for (auto& e : paintEdits)
+            cmdEdits.push_back({e.cx, e.cy, e.oldId, e.newId});
+        m_history.push(std::make_unique<PaintTilesCommand>(&m_game.getTiles(), std::move(cmdEdits)));
+        markDirty();
+    }
+
     sf::Vector2f mpOldB;
     if (auto* mpEnt = m_viewport.consumeMovingPlatformBComplete(mpOldB)) {
         if (auto* mp = dynamic_cast<Game::MovingPlatform*>(mpEnt)) {

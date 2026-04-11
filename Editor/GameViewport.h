@@ -20,6 +20,9 @@ struct HudInfo {
 };
 
 enum class ResizeHandle { None, TL, T, TR, L, R, BL, B, BR };
+enum class ToolMode { Select, PaintTile };
+
+struct PaintEdit { int cx; int cy; int oldId; int newId; };
 
 class GameViewport {
     sf::RenderTexture m_tex;
@@ -72,6 +75,12 @@ class GameViewport {
     sf::Vector2f m_mpDragStartB{0, 0};
     bool m_mpDragCompleted = false;
 
+    ToolMode m_tool = ToolMode::Select;
+    int m_paintTileId = 1;
+    bool m_painting = false;
+    std::vector<PaintEdit> m_paintStroke;
+    std::vector<PaintEdit> m_paintCompleted;
+
 public:
     float viewW() const;
     float viewH() const;
@@ -89,6 +98,10 @@ public:
     [[nodiscard]] bool consumeDragComplete(std::vector<std::pair<Engine::Entity*, sf::Vector2f>>& oldPositions);
     [[nodiscard]] Engine::Entity* consumeResizeComplete(sf::Vector2f& oldPos, sf::Vector2f& oldSize);
     [[nodiscard]] Engine::Entity* consumeMovingPlatformBComplete(sf::Vector2f& oldB);
+    [[nodiscard]] bool consumePaintComplete(std::vector<PaintEdit>& out);
+
+    ToolMode& tool() { return m_tool; }
+    int& paintTileId() { return m_paintTileId; }
 
     // player/enemies tie movement to size, so resizing them breaks the gameplay feel
     static bool isResizableType(const std::string& type);

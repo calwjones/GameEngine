@@ -121,6 +121,25 @@ void ToolbarRenderer::render() {
         if (gridOn) ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.18f, 0.42f, 0.38f, 1.f));
         if (ImGui::Button("Grid")) ctx.viewport.gridEnabled() = !ctx.viewport.gridEnabled();
         if (gridOn) ImGui::PopStyleColor();
+
+        ImGui::SameLine();
+        bool paintMode = (ctx.viewport.tool() == ToolMode::PaintTile);
+        if (paintMode) ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.42f, 0.28f, 0.52f, 1.f));
+        if (ImGui::Button(paintMode ? "Tile" : "Sel"))
+            ctx.viewport.tool() = paintMode ? ToolMode::Select : ToolMode::PaintTile;
+        if (paintMode) ImGui::PopStyleColor();
+        if (ImGui::IsItemHovered())
+            ImGui::SetTooltip(paintMode
+                ? "Paint tool: L-click paint, R-click erase — click to return to Select"
+                : "Select tool — click to switch to Tile paint");
+
+        if (paintMode) {
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(60);
+            int id = ctx.viewport.paintTileId();
+            if (ImGui::DragInt("##tileid", &id, 1, 1, 255, "id %d"))
+                ctx.viewport.paintTileId() = std::clamp(id, 1, 255);
+        }
         if (ImGui::IsItemHovered()) {
             if (gridOn)
                 ImGui::SetTooltip("Grid: ON (%.0fpx) [G] — click to disable", ctx.viewport.gridSize());

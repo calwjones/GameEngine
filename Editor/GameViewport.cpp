@@ -196,6 +196,13 @@ bool GameViewport::consumeDragComplete(std::vector<std::pair<Engine::Entity*, sf
     return true;
 }
 
+bool GameViewport::consumePaintComplete(std::vector<PaintEdit>& out) {
+    if (m_paintCompleted.empty()) return false;
+    out = std::move(m_paintCompleted);
+    m_paintCompleted.clear();
+    return true;
+}
+
 void GameViewport::drawLevelBounds() {
     sf::RectangleShape gameArea(sf::Vector2f(m_levelWidth, m_levelHeight));
     gameArea.setPosition(0.f, 0.f);
@@ -350,6 +357,49 @@ void GameViewport::render(Engine::Application& app, bool running,
         ImVec2 mouse = ImGui::GetMousePos();
         sf::Vector2f world = screenToWorld(mouse.x, mouse.y);
 
+        if (m_tool == ToolMode::PaintTile) {
+            m_hoverEntity = nullptr;
+            auto& tiles = app.getTiles();
+            if (tiles.width() <= 0 || tiles.height() <= 0) {
+                const float cs = 32.f;
+                int gw = std::max(1, (int)std::ceil(m_levelWidth / cs));
+                int gh = std::max(1, (int)std::ceil(m_levelHeight / cs));
+                tiles.resize(gw, gh, cs);
+            }
+
+            sf::Vector2i cell = tiles.worldToCell(world.x, world.y);
+            bool leftDown  = ImGui::IsMouseDown(ImGuiMouseButton_Left);
+            bool rightDown = ImGui::IsMouseDown(ImGuiMouseButton_Right);
+
+            if (leftDown || rightDown) {
+                int target = leftDown ? m_paintTileId : 0;
+                if (cell.x >= 0 && cell.y >= 0 &&
+                    cell.x < tiles.width() && cell.y < tiles.height()) {
+                    int cur = tiles.at(cell.x, cell.y);
+                    if (cur != target) {
+                        bool already = false;
+                        for (auto& p : m_paintStroke) {
+                            if (p.cx == cell.x && p.cy == cell.y) {
+                                p.newId = target;
+                                already = true;
+                                break;
+                            }
+                        }
+                        if (!already)
+                            m_paintStroke.push_back({cell.x, cell.y, cur, target});
+                        tiles.set(cell.x, cell.y, target);
+                    }
+                }
+                m_painting = true;
+            } else if (m_painting) {
+                m_painting = false;
+                if (!m_paintStroke.empty()) {
+                    m_paintCompleted = std::move(m_paintStroke);
+                    m_paintStroke.clear();
+                }
+            }
+        } else {
+
         m_resizeHover = ResizeHandle::None;
         m_mpHoverB = false;
         if (!m_dragging && !m_panning && !m_resizing && !m_mpDraggingB) {
@@ -471,6 +521,8 @@ void GameViewport::render(Engine::Application& app, bool running,
             m_panOffsetStart = m_viewOffset;
             m_panVelocity = {0.f, 0.f};
         }
+
+        }  // end select-mode branch
 
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Middle)) {
             m_panning = true;
