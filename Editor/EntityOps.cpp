@@ -4,10 +4,13 @@
 #include "LevelIO.h"
 #include "CommandHistory.h"
 #include "GameViewport.h"
+#include "../Engine/Core/Application.h"
 #include "../Engine/Entity/Entity.h"
 #include "../Engine/Entity/EntityManager.h"
 #include "../Engine/Entity/EntityFactory.h"
+#include "../Engine/Level/LevelLoader.h"
 #include "../Game/MovingPlatform.h"
+#include <filesystem>
 #include <memory>
 #include <string>
 
@@ -158,6 +161,67 @@ void EntityOps::duplicateEntity() {
     ctx.history.push(std::make_unique<AddEntityCommand>(ctx.game.getEntityManager(), e));
     ctx.markDirty();
     ctx.setStatus("Entity duplicated");
+}
+
+bool EntityOps::saveSelectionAsPrefab(const std::string& name) {
+    auto* src = ctx.selection ? ctx.selection->current() : nullptr;
+    if (!src) {
+        ctx.setStatus("No selection to save as prefab");
+        return false;
+    }
+    if (name.empty()) {
+        ctx.setStatus("Prefab name required");
+        return false;
+    }
+
+    std::filesystem::create_directories("assets/prefabs");
+    std::string filename = name;
+    if (filename.size() < 5 || filename.substr(filename.size() - 5) != ".json")
+        filename += ".json";
+    std::string path = "assets/prefabs/" + filename;
+
+    std::vector<Engine::Entity*> one{src};
+    if (!ctx.loader.saveToJSON(path, one, 0.f, 0.f, nullptr)) {
+        ctx.setStatus("Prefab save failed");
+        return false;
+    }
+    ctx.setStatus("Saved prefab " + filename);
+    return true;
+}
+
+bool EntityOps::instantiatePrefab(const std::string& path) {
+    auto loaded = ctx.loader.loadFromJSON(path);
+    if (loaded.empty()) {
+        ctx.setStatus("Prefab load failed");
+        return false;
+    }
+    Engine::Entity* e = loaded.front();
+    for (size_t i = 1; i < loaded.size(); ++i) delete loaded[i];
+
+    sf::Vector2f viewOff = ctx.viewport.getViewOffset();
+    float vw = ctx.viewport.viewW(), vh = ctx.viewport.viewH();
+    e->position = {viewOff.x + vw / 2.f - e->size.x / 2.f,
+                   viewOff.y + vh / 2.f - e->size.y / 2.f};
+
+    if (auto* mp = dynamic_cast<Game::MovingPlatform*>(e)) {
+        mp->setPointA(e->position);
+        mp->setPointB({e->position.x + 200.f, e->position.y});
+    }
+
+    int id = ctx.levelIO ? ctx.levelIO->nextEntityId() : 0;
+    if (!e->name.empty()) e->name += " " + std::to_string(id);
+
+    ctx.game.getEntityManager().addEntity(e);
+    if (ctx.selection) {
+        ctx.selection->select(e);
+        ctx.selection->findPlayer();
+    }
+    ctx.viewport.isVisible() = true;
+
+    ctx.history.push(std::make_unique<AddEntityCommand>(ctx.game.getEntityManager(), e));
+    ctx.markDirty();
+    ctx.setStatus("Instantiated " + e->name);
+    return true;
 }
 
 void EntityOps::deleteSelected() {

@@ -1,5 +1,6 @@
 #pragma once
 #include "EntityPalette.h"
+#include <string>
 
 namespace Editor {
 
@@ -15,6 +16,11 @@ public:
     void addFromTemplate(EntityTemplate tmpl);
     void duplicateEntity();
     void deleteSelected();
+
+    // Prefabs: save the current selection to assets/prefabs/<name>.json, or
+    // instantiate from a prefab file at viewport center.
+    bool saveSelectionAsPrefab(const std::string& name);
+    bool instantiatePrefab(const std::string& path);
 };
 
 }
