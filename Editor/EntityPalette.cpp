@@ -1,6 +1,8 @@
 #include "EntityPalette.h"
 #include <imgui.h>
 #include <algorithm>
+#include <cstring>
+#include <filesystem>
 
 namespace Editor {
 
@@ -8,6 +10,32 @@ EntityTemplate EntityPalette::consumeCreateRequest() {
     auto r = m_createRequest;
     m_createRequest = EntityTemplate::None;
     return r;
+}
+
+std::string EntityPalette::consumePrefabInstantiateRequest() {
+    std::string r = std::move(m_prefabInstantiateRequest);
+    m_prefabInstantiateRequest.clear();
+    return r;
+}
+
+bool EntityPalette::consumePrefabSaveRequest(std::string& outName) {
+    if (!m_prefabSaveRequested) return false;
+    outName = m_prefabSaveName;
+    m_prefabSaveName.clear();
+    m_prefabSaveRequested = false;
+    return true;
+}
+
+void EntityPalette::scanPrefabs() {
+    m_prefabFiles.clear();
+    std::filesystem::path dir = "assets/prefabs";
+    std::error_code ec;
+    if (!std::filesystem::exists(dir, ec)) return;
+    for (auto& entry : std::filesystem::directory_iterator(dir, ec)) {
+        if (entry.is_regular_file() && entry.path().extension() == ".json")
+            m_prefabFiles.push_back(entry.path().string());
+    }
+    std::sort(m_prefabFiles.begin(), m_prefabFiles.end());
 }
 
 void EntityPalette::render() {
@@ -82,6 +110,40 @@ void EntityPalette::render() {
             ImGui::SetTooltip("Click to place in scene");
 
         ImGui::PopID();
+    }
+
+    ImGui::Spacing();
+    ImGui::Separator();
+    if (ImGui::CollapsingHeader("Prefabs", ImGuiTreeNodeFlags_DefaultOpen)) {
+        static char saveBuf[64] = {0};
+        ImGui::TextDisabled("Save selection as");
+        ImGui::SetNextItemWidth(-60);
+        ImGui::InputText("##prefabname", saveBuf, sizeof(saveBuf));
+        ImGui::SameLine();
+        if (ImGui::Button("Save") && saveBuf[0]) {
+            m_prefabSaveName = saveBuf;
+            m_prefabSaveRequested = true;
+            saveBuf[0] = 0;
+        }
+
+        ImGui::Spacing();
+        if (ImGui::Button("Rescan", ImVec2(-1, 0))) scanPrefabs();
+
+        ImGui::Spacing();
+        if (m_prefabFiles.empty()) {
+            ImGui::TextDisabled("(no prefabs in assets/prefabs)");
+        } else {
+            for (const auto& path : m_prefabFiles) {
+                auto slash = path.find_last_of('/');
+                std::string label = (slash != std::string::npos) ? path.substr(slash + 1) : path;
+                if (label.size() > 5 && label.substr(label.size() - 5) == ".json")
+                    label = label.substr(0, label.size() - 5);
+                if (ImGui::Selectable(label.c_str(), false))
+                    m_prefabInstantiateRequest = path;
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip("Click to instantiate at viewport center");
+            }
+        }
     }
 
     ImGui::End();
