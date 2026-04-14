@@ -94,6 +94,7 @@ bool EditorApplication::initialize(unsigned int w, unsigned int h) {
     m_loader.setFactory(&m_factory);
 
     m_levelIO.scanLevelFiles();
+    m_palette.scanPrefabs();
     m_levelIO.scanLevelGroups();
     if (std::filesystem::exists("assets/levels/demo_level.json"))
         m_levelIO.loadLevel("assets/levels/demo_level.json");
@@ -354,6 +355,15 @@ void EditorApplication::renderImGui() {
     m_palette.render();
     auto tmpl = m_palette.consumeCreateRequest();
     if (tmpl != EntityTemplate::None) m_entityOps.addFromTemplate(tmpl);
+
+    auto prefabPath = m_palette.consumePrefabInstantiateRequest();
+    if (!prefabPath.empty()) m_entityOps.instantiatePrefab(prefabPath);
+
+    std::string prefabSaveName;
+    if (m_palette.consumePrefabSaveRequest(prefabSaveName)) {
+        if (m_entityOps.saveSelectionAsPrefab(prefabSaveName))
+            m_palette.scanPrefabs();
+    }
 
     ImGui::SetNextWindowPos(ImVec2(w - panel, toolbar), ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(ImVec2(panel, content), ImGuiCond_FirstUseEver);
