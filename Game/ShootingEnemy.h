@@ -61,11 +61,11 @@ public:
 
     void update(float dt) override {
         velocity.x = m_speed * m_dir;
-        if (m_hasBounds) {
-            if (m_dir > 0 && position.x + size.x >= m_maxX) { m_dir = -m_dir; position.x = m_maxX - size.x; }
-            else if (m_dir < 0 && position.x <= m_minX) { m_dir = -m_dir; position.x = m_minX; }
-        }
         position += velocity * dt;
+        if (m_hasBounds) {
+            if (position.x + size.x > m_maxX) { m_dir = -m_dir; position.x = m_maxX - size.x; }
+            else if (position.x < m_minX) { m_dir = -m_dir; position.x = m_minX; }
+        }
 
         m_fireTimer += dt;
         if (m_fireTimer >= m_fireRate) {

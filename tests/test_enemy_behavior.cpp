@@ -3,6 +3,7 @@
 #include "Game/Enemy.h"
 #include "Game/FlyingEnemy.h"
 #include "Game/ShootingEnemy.h"
+#include <cmath>
 
 using Catch::Matchers::WithinAbs;
 
@@ -24,18 +25,47 @@ TEST_CASE("enemy serialize round-trip preserves patrol config", "[behavior]") {
     REQUIRE(dst.getMaxX() == 200.f);
 }
 
-TEST_CASE("enemy patrol bounces at right bound", "[behavior]") {
+TEST_CASE("enemy reverses and clamps to right bound after overshoot", "[behavior]") {
     Game::Enemy e;
     e.size = {32.f, 32.f};
-    e.position = {150.f, 0.f};
+    e.position = {168.f, 0.f};
     e.setPatrolSpeed(100.f);
     e.setDirection(1.f);
     e.setPatrolBounds(0.f, 200.f);
 
-    for (int i = 0; i < 60; ++i) e.update(1.f / 60.f);
+    e.update(0.1f);
 
     REQUIRE(e.getDirection() == -1.f);
-    REQUIRE(e.position.x <= 168.f);
+    REQUIRE_THAT(e.position.x, WithinAbs(168.f, 1e-4f));
+}
+
+TEST_CASE("enemy reverses and clamps to left bound after overshoot", "[behavior]") {
+    Game::Enemy e;
+    e.size = {32.f, 32.f};
+    e.position = {0.f, 0.f};
+    e.setPatrolSpeed(100.f);
+    e.setDirection(-1.f);
+    e.setPatrolBounds(0.f, 200.f);
+
+    e.update(0.1f);
+
+    REQUIRE(e.getDirection() == 1.f);
+    REQUIRE_THAT(e.position.x, WithinAbs(0.f, 1e-4f));
+}
+
+TEST_CASE("enemy stays within patrol bounds over many steps", "[behavior]") {
+    Game::Enemy e;
+    e.size = {32.f, 32.f};
+    e.position = {100.f, 0.f};
+    e.setPatrolSpeed(200.f);
+    e.setDirection(1.f);
+    e.setPatrolBounds(0.f, 200.f);
+
+    for (int i = 0; i < 600; ++i) {
+        e.update(1.f / 60.f);
+        REQUIRE(e.position.x >= 0.f);
+        REQUIRE(e.position.x + e.size.x <= 200.f);
+    }
 }
 
 TEST_CASE("flying enemy serialize round-trip preserves sine params", "[behavior]") {
@@ -60,24 +90,19 @@ TEST_CASE("flying enemy serialize round-trip preserves sine params", "[behavior]
     REQUIRE(dst.hasBounds());
 }
 
-TEST_CASE("flying enemy y oscillates around baseY", "[behavior]") {
+TEST_CASE("flying enemy y matches closed-form sine after one step", "[behavior]") {
     Game::FlyingEnemy e;
     e.size = {28.f, 28.f};
-    e.position = {0.f, 100.f};
     e.setBaseY(100.f);
     e.setAmplitude(50.f);
     e.setFrequency(2.f);
     e.setPatrolSpeed(0.f);
 
-    float minY = 1e9f, maxY = -1e9f;
-    for (int i = 0; i < 240; ++i) {
-        e.update(1.f / 60.f);
-        minY = std::min(minY, e.position.y);
-        maxY = std::max(maxY, e.position.y);
-    }
+    const float dt = 0.25f;
+    e.update(dt);
 
-    REQUIRE_THAT(maxY - 100.f, WithinAbs(50.f, 2.f));
-    REQUIRE_THAT(100.f - minY, WithinAbs(50.f, 2.f));
+    const float expected = 100.f + 50.f * std::sin(2.f * dt);
+    REQUIRE_THAT(e.position.y, WithinAbs(expected, 1e-4f));
 }
 
 TEST_CASE("shooting enemy serialize round-trip preserves fire config", "[behavior]") {
@@ -101,19 +126,33 @@ TEST_CASE("shooting enemy serialize round-trip preserves fire config", "[behavio
     REQUIRE(dst.getMaxX() == 400.f);
 }
 
-TEST_CASE("shooting enemy fires on cadence", "[behavior]") {
+TEST_CASE("shooting enemy fires once per fire rate interval", "[behavior]") {
     Game::ShootingEnemy e;
-    e.size = {32.f, 32.f};
-    e.position = {0.f, 0.f};
     e.setFireRate(1.f);
     e.setPatrolSpeed(0.f);
 
+    e.update(0.5f);
+    REQUIRE_FALSE(e.consumeFireFlag());
+
+    e.update(0.5f);
+    REQUIRE(e.consumeFireFlag());
+
+    e.update(0.9f);
+    REQUIRE_FALSE(e.consumeFireFlag());
+
+    e.update(0.1f);
+    REQUIRE(e.consumeFireFlag());
+}
+
+TEST_CASE("shooting enemy fires exactly N times over N intervals", "[behavior]") {
+    Game::ShootingEnemy e;
+    e.setFireRate(0.5f);
+    e.setPatrolSpeed(0.f);
+
     int shots = 0;
-    for (int i = 0; i < 300; ++i) {
-        e.update(1.f / 60.f);
+    for (int i = 0; i < 10; ++i) {
+        e.update(0.5f);
         if (e.consumeFireFlag()) ++shots;
     }
-
-    REQUIRE(shots >= 4);
-    REQUIRE(shots <= 6);
+    REQUIRE(shots == 10);
 }

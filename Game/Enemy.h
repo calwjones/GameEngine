@@ -44,11 +44,11 @@ public:
 
     void update(float dt) override {
         velocity.x = m_speed * m_dir;
-        if (m_hasBounds) {
-            if (m_dir > 0 && position.x + size.x >= m_maxX) { reverseDirection(); position.x = m_maxX - size.x; }
-            else if (m_dir < 0 && position.x <= m_minX) { reverseDirection(); position.x = m_minX; }
-        }
         position += velocity * dt;
+        if (m_hasBounds) {
+            if (position.x + size.x > m_maxX) { reverseDirection(); position.x = m_maxX - size.x; }
+            else if (position.x < m_minX) { reverseDirection(); position.x = m_minX; }
+        }
     }
 };
 
