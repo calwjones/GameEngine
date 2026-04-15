@@ -20,6 +20,9 @@ add_executable(GameEngineTests
     test_tilemap.cpp
     test_prefab.cpp
     test_enemy_behavior.cpp
+    test_physics.cpp
+    test_moving_platform.cpp
+    test_level_group.cpp
     ${CMAKE_SOURCE_DIR}/Editor/CommandHistory.cpp
 )
 
