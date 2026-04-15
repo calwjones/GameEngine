@@ -7,6 +7,7 @@ external/SFML/doc/
 .claude/
 .cache/
 CLAUDE.md
+tasks/
 
 # IDE files
 .vs/
